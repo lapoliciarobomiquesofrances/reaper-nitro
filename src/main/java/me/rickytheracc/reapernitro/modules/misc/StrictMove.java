@@ -42,11 +42,10 @@ public class StrictMove extends ReaperModule {
     @EventHandler
     private void onPacketReceive(PacketEvent.Receive event) {
         if (event.packet instanceof PlayerPositionLookS2CPacket lookPacket) {
-            //BlockPos pos = new BlockPos(lookPacket.getX(), lookPacket.getY(), lookPacket.getZ());
             if (MathUtil.msPassed(lastPearl) < 500 || MathUtil.msPassed(lastChorus) < 150) return;
             if (alert.get()) warning("Lag-back detected!");
-            if (toggleCombat.get()) ModuleHelper.disableCombat();
-            if (toggleMovement.get()) ModuleHelper.disableMovement();
+            if (toggleCombat.get()) ModuleHelper.disableCombat(this);
+            if (toggleMovement.get()) ModuleHelper.disableMovement(this);
         }
     }
 
