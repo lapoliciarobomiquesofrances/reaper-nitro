@@ -2,16 +2,21 @@ package me.rickytheracc.reapernitro.modules.chat;
 
 import me.rickytheracc.reapernitro.modules.ML;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
-import me.rickytheracc.reapernitro.util.player.Interactions;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.DoubleSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArmorAlert extends ReaperModule {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
+
+    // General
 
     private final Setting<Double> threshold = sgGeneral.add(new DoubleSetting.Builder()
         .name("durability")
@@ -26,48 +31,46 @@ public class ArmorAlert extends ReaperModule {
         super(ML.M, "armor-alert", "Alerts you when your armor pieces are low.");
     }
 
-    private boolean alertedHelm;
-    private boolean alertedChest;
-    private boolean alertedLegs;
-    private boolean alertedBoots;
+    List<Integer> alertedSlots = new ArrayList<>();
 
     @Override
     public void onActivate() {
-        alertedHelm = false;
-        alertedChest = false;
-        alertedLegs = false;
-        alertedBoots = false;
+        alertedSlots.clear();
     }
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        Iterable<ItemStack> armorPieces = mc.player.getArmorItems();
-        for (ItemStack armorPiece : armorPieces) {
+        for (int i = 0; i < 4; i++) {
+            ItemStack item = mc.player.getInventory().getArmorStack(i);
 
-            if (Interactions.checkThreshold(armorPiece, threshold.get())) {
-                if (Interactions.isHelm(armorPiece) && !alertedHelm) {
-                    warning("Your helmet is low");
-                    alertedHelm = true;
-                }
-                if (Interactions.isChest(armorPiece) && !alertedChest) {
-                    warning("Your chestplate is low");
-                    alertedChest = true;
-                }
-                if (Interactions.isLegs(armorPiece) && !alertedLegs) {
-                    warning("Your leggings are low");
-                    alertedLegs = true;
-                }
-                if (Interactions.isBoots(armorPiece) && !alertedBoots) {
-                    warning("Your boots are low");
-                    alertedBoots = true;
-                }
+            if (item.isEmpty()) {
+                alertedSlots.remove(i);
+                return;
             }
-            if (!Interactions.checkThreshold(armorPiece, threshold.get())) {
-                if (Interactions.isHelm(armorPiece) && alertedHelm) alertedHelm = false;
-                if (Interactions.isChest(armorPiece) && alertedChest) alertedChest = false;
-                if (Interactions.isLegs(armorPiece) && alertedLegs) alertedLegs = false;
-                if (Interactions.isBoots(armorPiece) && alertedBoots) alertedBoots = false;
-            }
+
+            boolean low = (float) (item.getMaxDamage() - item.getDamage()) / item.getMaxDamage() * 100 < threshold.get();
+
+            if (low) {
+                String itemMessage = getMessage(i, item);
+                warning("Your " + itemMessage + "low!");
+                alertedSlots.add(i);
+            } else alertedSlots.remove(i);
         }
     }
+
+    private String getMessage(Integer slot, ItemStack stack) {
+        String name;
+
+        if (stack.getItem() == Items.ELYTRA) name = "elytra is ";
+        else switch (slot) {
+            case 0 -> name = "boots are ";
+            case 1 -> name = "leggings are ";
+            case 2 -> name = "chestplate is ";
+            case 3 -> name = "helmet is ";
+            default -> throw new IllegalArgumentException("Invalid slot provided: " + slot);
+        }
+
+        return name;
+    }
+
 }
