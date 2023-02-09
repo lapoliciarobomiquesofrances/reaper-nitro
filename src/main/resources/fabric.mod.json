@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "reaper",
+  "id": "reaper-nitro",
   "version": "${version}",
-  "name": "Reaper",
+  "name": "Reaper Nitro",
   "description": "The Best Meteor Addon",
   "authors": [
     "NotGhostTypes"
@@ -13,7 +13,7 @@
   "environment": "client",
   "entrypoints": {
     "meteor": [
-      "me.ghosttypes.reaper.Reaper"
+      "me.rickytheracc.reapernitro.Reaper"
     ]
   },
   "mixins": [

@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "me.ghosttypes.reaper.mixins",
+  "package": "me.rickytheracc.reapernitro.mixins",
   "compatibilityLevel": "JAVA_17",
   "client": [
     "MinecraftClientMixin",
