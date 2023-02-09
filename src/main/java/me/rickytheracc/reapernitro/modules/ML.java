@@ -1,15 +1,10 @@
 package me.rickytheracc.reapernitro.modules;
 
 import me.rickytheracc.reapernitro.Reaper;
-import me.ghosttypes.reaper.modules.chat.*;
-import me.ghosttypes.reaper.modules.combat.*;
-import me.ghosttypes.reaper.modules.hud.*;
-import me.ghosttypes.reaper.modules.misc.*;
 import me.rickytheracc.reapernitro.modules.chat.*;
 import me.rickytheracc.reapernitro.modules.combat.*;
 import me.rickytheracc.reapernitro.modules.misc.*;
 import me.rickytheracc.reapernitro.modules.misc.elytrabot.ElytraBotThreaded;
-import me.ghosttypes.reaper.modules.render.*;
 import me.rickytheracc.reapernitro.modules.render.ExternalFeed;
 import me.rickytheracc.reapernitro.modules.render.ExternalHUD;
 import me.rickytheracc.reapernitro.modules.render.ExternalNotifications;
