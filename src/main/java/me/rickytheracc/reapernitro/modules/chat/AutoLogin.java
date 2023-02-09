@@ -3,7 +3,9 @@ package me.rickytheracc.reapernitro.modules.chat;
 import me.rickytheracc.reapernitro.modules.ML;
 import me.rickytheracc.reapernitro.util.misc.MessageUtil;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
+import meteordevelopment.meteorclient.events.game.GameJoinedEvent;
 import meteordevelopment.meteorclient.events.game.ReceiveMessageEvent;
+import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.IntSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
@@ -35,22 +37,24 @@ public class AutoLogin extends ReaperModule {
         super(ML.M, "auto-login", "Automatically log into servers that use /login.");
     }
 
-    private final ArrayList<String> loginMessages = new ArrayList<>() {{
-        add("/login ");
-        add("/login <password>");
-    }};
+    private int messageDelay;
+    private boolean shouldSend;
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    private void onMessageRecieve(ReceiveMessageEvent event) {
-        if (mc.world == null || mc.player == null) return;
-        String msg = event.getMessage().getString();
-        if (msg.startsWith(">")) return; // Ignore chat messages
+    @EventHandler
+    private void onJoin(GameJoinedEvent event) {
+        shouldSend = true;
+        messageDelay = 40;
+    }
 
-        for (String loginMsg: loginMessages) {
-            if (msg.contains(loginMsg)) {
-                ChatUtils.sendPlayerMsg("/login " + password.get());
-                break;
-            }
+    @EventHandler
+    private void onTick(TickEvent.Post event) {
+        if (!shouldSend) return;
+        if (messageDelay > 0) {
+            messageDelay --;
+            return;
         }
+
+        ChatUtils.sendPlayerMsg("/login " + password.get());
+        shouldSend = false;
     }
 }
