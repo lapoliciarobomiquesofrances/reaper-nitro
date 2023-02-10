@@ -7,7 +7,7 @@
     "Bootstrap",
     "meteor.FakePlayerMixin",
     "meteor.MeteorBootstrap",
-    "meteor.NotificationProxy",
+    "meteor.ChatUtilsMixin",
     "meteor.StringListSettingMixin"
   ],
   "injectors": {

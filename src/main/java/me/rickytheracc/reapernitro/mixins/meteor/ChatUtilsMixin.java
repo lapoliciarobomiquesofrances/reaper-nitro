@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ChatUtils.class)
-public class NotificationProxy {
+@Mixin(value = ChatUtils.class, remap = false)
+public class ChatUtilsMixin {
 
     // This is for redirecting Meteor (and other addon's) modules info/warning/error methods to a notification
     // Reaper modules should extend ExtendedModule instead.
