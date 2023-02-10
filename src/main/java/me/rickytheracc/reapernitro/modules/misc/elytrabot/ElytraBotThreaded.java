@@ -2,7 +2,6 @@ package me.rickytheracc.reapernitro.modules.misc.elytrabot;
 
 import baritone.api.BaritoneAPI;
 import me.rickytheracc.reapernitro.modules.ML;
-import me.ghosttypes.reaper.modules.misc.elytrabot.utils.*;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.modules.misc.elytrabot.utils.*;
 import meteordevelopment.meteorclient.MeteorClient;
@@ -259,10 +258,10 @@ public class ElytraBotThreaded extends ReaperModule {
     private boolean lagback, toggledNoFall, isRunning;
     private double blocksPerSecond;
     private int blocksPerSecondCounter;
-    private TimerUtil blocksPerSecondTimer = new TimerUtil();
-    private TimerUtil packetTimer = new TimerUtil();
-    private TimerUtil fireworkTimer = new TimerUtil();
-    private TimerUtil takeoffTimer = new TimerUtil();
+    private final TimerUtil blocksPerSecondTimer = new TimerUtil();
+    private final TimerUtil packetTimer = new TimerUtil();
+    private final TimerUtil fireworkTimer = new TimerUtil();
+    private final TimerUtil takeoffTimer = new TimerUtil();
 
     public enum Mode {Highway, Overworld, Tunnel}
     public enum TakeoffMode {SlowGlide, PacketFLy, Jump}

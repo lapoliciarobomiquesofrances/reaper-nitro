@@ -18,7 +18,6 @@ public class GlobalManager {
     public static ArrayList<DeathEntry> deathEntries = new ArrayList<>();
     public static final Object2IntMap<UUID> deaths = new Object2IntOpenHashMap<>(); // todo - implement as a placeholder for autoez
 
-
     public static long lastRespawnTime = System.currentTimeMillis();
 
     public static boolean canAutoEz() {

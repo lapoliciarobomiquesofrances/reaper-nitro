@@ -35,39 +35,13 @@ public class ResourceLoaderService {
         });
     }
 
-    public static void initUserDB() {
-        //DEVELOPERS.addAll(List.of("GhostTypes", "EurekaEffect", "Kiriyaga", "Wide_Cat"));
-        //initDB(BETA, BETA_DB_URL);
-        //initDB(USER, USER_DB_URL);
-    }
-
-
-    // dummy identifiers
-    public static final Identifier LOGO = new Identifier("reaper", "cope_1");
-    public static final Identifier LOGO_BEAMS = new Identifier("reaper", "cope_2");
-    public static final Identifier LOGO_COLORSPLASH = new Identifier("reaper", "cope_3");
-    public static final Identifier LOGO_GALAXY = new Identifier("reaper", "cope_4");
-    public static final Identifier LOGO_PURPLE = new Identifier("reaper", "cope_5");
-    public static final Identifier LOGO_RED = new Identifier("reaper", "cope_6");
-
     public static ArrayList<Resource> serverResources = new ArrayList<>();
 
-    // public static void initRSC() {
-    //     // assets that will be loaded and registered to an identifier
-    //     serverResources.add(new Resource(LOGO, "https://raw.githubusercontent.com/GhostTypes/reaper-assets/main/reaper_white.png", "reaper_white"));
-    //     serverResources.add(new Resource(LOGO_BEAMS, "https://raw.githubusercontent.com/GhostTypes/reaper-assets/main/icon_beams-min.png", "icon_beams-min"));
-    //     serverResources.add(new Resource(LOGO_COLORSPLASH, "https://raw.githubusercontent.com/GhostTypes/reaper-assets/main/icon_colorsplash-min.png", "icon_colorsplash-min"));
-    //     serverResources.add(new Resource(LOGO_GALAXY, "https://raw.githubusercontent.com/GhostTypes/reaper-assets/main/icon_galaxy_1-min.png", "icon_galaxy_1-min"));
-    //     serverResources.add(new Resource(LOGO_PURPLE, "https://raw.githubusercontent.com/GhostTypes/reaper-assets/main/icon_purple_galaxy-min.png", "icon_purple_galaxy-min"));
-    //     serverResources.add(new Resource(LOGO_RED, "https://raw.githubusercontent.com/GhostTypes/reaper-assets/main/icon_red-min.png", "icon_red-min"));
-    // }
-
     public static void init() {
-        initUserDB(); // load the dev/beta/user list
-        for (Resource r : serverResources) if (!r.isCached()) r.cache(); // download anything that isn't cached yet
+        for (Resource r : serverResources) if (!r.isCached()) r.cache(); // Download anything that isn't cached yet
         TL.cached.execute(() -> {
             while (mc.world == null) {
-                try {Thread.sleep(500);} catch (Exception ignored) {} // wait for the world to load
+                try {Thread.sleep(500);} catch (Exception ignored) {} // Wait for the world to load
             }
             Reaper.log("Loading assets");
             serverResources.forEach(Resource::load);

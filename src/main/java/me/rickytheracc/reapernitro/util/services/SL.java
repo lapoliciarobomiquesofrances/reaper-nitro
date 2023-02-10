@@ -9,18 +9,13 @@ import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 
 public class SL { // Service loader
-
-
     public static void load() {
         long start = MathUtil.now();
-        OSUtil.init(); // setup current os for stuff like spotify
-        ResourceLoaderService.init(); // download assets
+        OSUtil.init(); // setup current OS for stuff like spotify
+        ResourceLoaderService.init(); // Download assets
         MeteorClient.EVENT_BUS.subscribe(GlobalManager.class);
-        //GlobalManager.init();
         MessageUtil.init();
         NotificationManager.init();
-        //SpotifyService.init();
-        //WellbeingService.init(); useless
         Runtime.getRuntime().addShutdownHook(new Thread(TL::shutdown));
         Reaper.log("Started services (" + MathUtil.msPassed(start) + "ms)");
 
