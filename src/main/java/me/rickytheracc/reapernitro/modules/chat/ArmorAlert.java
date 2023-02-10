@@ -44,7 +44,7 @@ public class ArmorAlert extends ReaperModule {
             ItemStack item = mc.player.getInventory().getArmorStack(i);
 
             if (item.isEmpty()) {
-                alertedSlots.remove(i);
+                if (alertedSlots.contains(i)) alertedSlots.remove(i);
                 return;
             }
 
@@ -54,11 +54,13 @@ public class ArmorAlert extends ReaperModule {
                 String itemMessage = getMessage(i, item);
                 warning("Your " + itemMessage + "low!");
                 alertedSlots.add(i);
-            } else alertedSlots.remove(i);
+            } else if (alertedSlots.contains(i)) {
+                alertedSlots.remove(i);
+            }
         }
     }
 
-    private String getMessage(Integer slot, ItemStack stack) {
+    private String getMessage(int slot, ItemStack stack) {
         String name;
 
         if (stack.getItem() == Items.ELYTRA) name = "elytra is ";
