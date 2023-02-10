@@ -7,7 +7,7 @@ import meteordevelopment.meteorclient.settings.IntSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 
-public class NotificationSettings extends ReaperModule {
+public class NotifSettings extends ReaperModule {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     // General
@@ -48,7 +48,7 @@ public class NotificationSettings extends ReaperModule {
         .build()
     );
 
-    public NotificationSettings() {
+    public NotifSettings() {
         super(ML.M, "notifications", "Settings for hud notifications.");
     }
 }

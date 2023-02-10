@@ -1,7 +1,7 @@
 package me.rickytheracc.reapernitro.mixins.meteor;
 
 
-import me.rickytheracc.reapernitro.modules.chat.NotificationSettings;
+import me.rickytheracc.reapernitro.modules.chat.NotifSettings;
 import me.rickytheracc.reapernitro.util.services.NotificationManager;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
@@ -18,21 +18,21 @@ public class ChatUtilsMixin {
 
     @Inject(method = "info(Ljava/lang/String;[Ljava/lang/Object;)V", at = @At("HEAD"), cancellable = true, remap = false)
     private static void infoProxy(String message, Object[] args, CallbackInfo ci) {
-        NotificationSettings ns = Modules.get().get(NotificationSettings.class);
+        NotifSettings ns = Modules.get().get(NotifSettings.class);
         if (ns.info.get()) NotificationManager.addNotification(message);
         if (ns.hide.get()) ci.cancel();
     }
 
     @Inject(method = "warning(Ljava/lang/String;[Ljava/lang/Object;)V", at = @At("HEAD"), cancellable = true, remap = false)
     private static void warningProxy(String message, Object[] args, CallbackInfo ci) {
-        NotificationSettings ns = Modules.get().get(NotificationSettings.class);
+        NotifSettings ns = Modules.get().get(NotifSettings.class);
         if (ns.warning.get()) NotificationManager.addNotification(message);
         if (ns.hide.get()) ci.cancel();
     }
 
     @Inject(method = "error(Ljava/lang/String;[Ljava/lang/Object;)V", at = @At("HEAD"), cancellable = true, remap = false)
     private static void errorProxy(String message, Object[] args, CallbackInfo ci) {
-        NotificationSettings ns = Modules.get().get(NotificationSettings.class);
+        NotifSettings ns = Modules.get().get(NotifSettings.class);
         if (ns.error.get()) NotificationManager.addNotification(message);
         if (ns.hide.get()) ci.cancel();
     }

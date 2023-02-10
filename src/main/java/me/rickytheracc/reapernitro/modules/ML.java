@@ -65,7 +65,7 @@ public class ML { // Module loader
             new BedAlerts(),
             new ChatTweaks(),
             new BreakAlert(),
-            new NotificationSettings(),
+            new NotifSettings(),
             new PopCounter(),
             new Welcomer()
         );

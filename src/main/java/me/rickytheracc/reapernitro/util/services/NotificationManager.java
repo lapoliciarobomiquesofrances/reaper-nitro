@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.util.services;
 
-import me.rickytheracc.reapernitro.modules.chat.NotificationSettings;
+import me.rickytheracc.reapernitro.modules.chat.NotifSettings;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class NotificationManager {
 
     public static void addNotification(String message) {
         for (Notification n : threadSafeNotifs) if (n.text.contains(message) || n.text.equalsIgnoreCase(message)) return; // no duplicates
-        notifications.add(new Notification(message, Modules.get().get(NotificationSettings.class).displayTime.get())); }
+        notifications.add(new Notification(message, Modules.get().get(NotifSettings.class).displayTime.get())); }
 
     public static ArrayList<Notification> getNotifications() {
         threadSafeNotifs.clear();
