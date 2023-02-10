@@ -34,7 +34,7 @@ import java.util.List;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
-@Mixin(FakePlayer.class)
+@Mixin(value = FakePlayer.class, remap = false)
 public class FakePlayerMixin {
     @Shadow(remap = false)
     @Final
