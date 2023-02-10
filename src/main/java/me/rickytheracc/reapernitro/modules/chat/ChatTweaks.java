@@ -84,7 +84,7 @@ public class ChatTweaks extends ReaperModule {
 
     public final Setting<SettingColor> leftBracketColor = sgPrefix.add(new ColorSetting.Builder()
         .name("bracket-color")
-        .description("Color of the prefix text.")
+        .description("Color of the left bracket.")
         .defaultValue(new SettingColor(150,150,150,255))
         .visible(usePrefix::get)
         .onChanged(setting -> handlePrefix())
@@ -102,7 +102,7 @@ public class ChatTweaks extends ReaperModule {
 
     public final Setting<SettingColor> rightBracketColor = sgPrefix.add(new ColorSetting.Builder()
         .name("bracket-color")
-        .description("Color of the prefix text.")
+        .description("Color of the right bracket.")
         .defaultValue(new SettingColor(150,150,150,255))
         .visible(usePrefix::get)
         .onChanged(setting -> handlePrefix())
