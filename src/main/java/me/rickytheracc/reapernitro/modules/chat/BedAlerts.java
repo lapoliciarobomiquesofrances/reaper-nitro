@@ -2,82 +2,117 @@ package me.rickytheracc.reapernitro.modules.chat;
 
 import me.rickytheracc.reapernitro.modules.ML;
 import me.rickytheracc.reapernitro.modules.combat.SelfTrapPlus;
-import me.rickytheracc.reapernitro.util.misc.MathUtil;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.player.Interactions;
 import meteordevelopment.meteorclient.events.world.TickEvent;
-import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.settings.BoolSetting;
+import meteordevelopment.meteorclient.settings.DoubleSetting;
+import meteordevelopment.meteorclient.settings.Setting;
+import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.systems.friends.Friends;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BedItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 
 import java.util.ArrayList;
 
-public class BedAlerts extends ReaperModule {
+import static meteordevelopment.orbit.EventPriority.HIGHEST;
 
+public class BedAlerts extends ReaperModule {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
+    private final Setting<Double> range = sgGeneral.add(new DoubleSetting.Builder()
+        .name("check-range")
+        .description("How far away to check players using beds.")
+        .defaultValue(8)
+        .min(0)
+        .sliderMax(20)
+        .build()
+    );
 
-    private final Setting<Double> range = sgGeneral.add(new DoubleSetting.Builder().name("range").description("how far away to check players").defaultValue(3.5).min(0).sliderMax(10).build());
-    private final Setting<Boolean> smartTrap = sgGeneral.add(new BoolSetting.Builder().name("smart-trap").description("automatically self-trap when a bedfag is nearby").defaultValue(false).build());
-    private final Setting<Boolean> smartTrapHole = sgGeneral.add(new BoolSetting.Builder().name("require-hole").description("automatically self-trap when a bedfag is nearby").defaultValue(false).build());
-    private final Setting<Double> smartTrapRange = sgGeneral.add(new DoubleSetting.Builder().name("smart-trap-range").description("how close a bedfag needs to be to trigger smart trap").defaultValue(2).min(0).sliderMax(10).build());
+    private final Setting<Boolean> ignoreFriends = sgGeneral.add(new BoolSetting.Builder()
+        .name("ignore-friends")
+        .description("Don't notify you if your friends use beds.")
+        .defaultValue(true)
+        .build()
+    );
 
-    private long lastTrap;
-    private final ArrayList<PlayerEntity> bedFags = new ArrayList<>();
-    private final ArrayList<PlayerEntity> craftFags = new ArrayList<>();
+    private final Setting<Boolean> countCrafting = sgGeneral.add(new BoolSetting.Builder()
+        .name("count-crafting")
+        .description("Mark people as bed users if they hold crafting tables.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> smartTrap = sgGeneral.add(new BoolSetting.Builder()
+        .name("smart-trap")
+        .description("automatically self-trap when a bed user is nearby.")
+        .defaultValue(false)
+        .build()
+    );
+
+    private final Setting<Double> smartRange = sgGeneral.add(new DoubleSetting.Builder()
+        .name("smart-range")
+        .description("How close a bed user needs to be to trigger smart trap.")
+        .defaultValue(2)
+        .min(0)
+        .sliderMax(10)
+        .visible(smartTrap::get)
+        .build()
+    );
+
+    private final Setting<Boolean> requireHole = sgGeneral.add(new BoolSetting.Builder()
+        .name("require-hole")
+        .description("automatically self-trap when a bed user is nearby.")
+        .defaultValue(true)
+        .visible(smartTrap::get)
+        .build()
+    );
 
     public BedAlerts() {
-        super(ML.M, "bed-alerts", "alerts you about nearby bedfags");
+        super(ML.M, "bed-alerts", "Alerts you about nearby players with beds in their inventory.");
     }
+
+    private final ArrayList<PlayerEntity> bedFags = new ArrayList<>();
 
     @Override
     public void onActivate() {
-        lastTrap = MathUtil.now() - 5000;
         bedFags.clear();
     }
 
-    @EventHandler
-    private void onTick(TickEvent.Pre event) {
-        boolean shouldTrap = false;
-        for (Entity e : mc.world.getEntities()) {
-            if (e instanceof PlayerEntity player && player != mc.player && mc.player.distanceTo(player) <= range.get()) {
-                if (player.getMainHandStack().getItem() instanceof BedItem || player.getOffHandStack().getItem() instanceof BedItem) {
-                    if (!bedFags.contains(player)) { // bedfag detection
-                        bedFags.add(player);
-                        warning(player.getEntityName() + " is bedfagging.");
-                    }
-                    if (!shouldTrap) if (smartTrap.get() && mc.player.distanceTo(player) < smartTrapRange.get()) shouldTrap = true; // check if we should self-trap
-                } else if (bedFags.contains(player)) {
-                    info(player.getEntityName() + " is no longer bedfagging.");
-                    bedFags.remove(player); // remove once they aren't holding a bed
-                }
-                if (bedFags.contains(player)) {
-                    if (player.getMainHandStack().getItem().equals(Items.CRAFTING_TABLE) || player.getOffHandStack().getItem().equals(Items.CRAFTING_TABLE)) {
-                        if (!craftFags.contains(player)) { // crafting detection
-                            craftFags.add(player);
-                            warning(player.getEntityName() + " is crafting beds.");
-                        }
-                    }
-                } else if (craftFags.contains(player)) {
-                    info(player.getEntityName() + " is no longer crafting beds.");
-                    craftFags.remove(player); // remove once they aren't crafting
-                }
+    @EventHandler(priority = HIGHEST)
+    private void onCope(TickEvent.Pre event) {
+        for (PlayerEntity player : mc.world.getPlayers()) {
+            if (bedFags.contains(player)) continue;
+            if (mc.player.squaredDistanceTo(player) > range.get() * range.get()) continue;
+            if (Friends.get().isFriend(player) && ignoreFriends.get()) continue;
+
+            Item mainItem = player.getMainHandStack().getItem();
+            if (mainItem instanceof BedItem || mainItem == Items.CRAFTING_TABLE && countCrafting.get()) {
+                warning(player.getEntityName() + " is using beds!");
+                bedFags.add(player);
+                continue;
+            }
+
+            Item offItem = player.getOffHandStack().getItem();
+            if (offItem instanceof BedItem || offItem == Items.CRAFTING_TABLE && countCrafting.get()) {
+                warning(player.getEntityName() + " is using beds!");
+                bedFags.add(player);
             }
         }
-        if (MathUtil.msPassed(lastTrap) > 2000 && shouldTrap) {
-            if (smartTrapHole.get() && !Interactions.isInHole()) return;
-            info("Trying to self-trap...");
-            try {
-                SelfTrapPlus stp = Modules.get().get(SelfTrapPlus.class);
-                if (!stp.isActive()) {
-                    stp.toggle();
-                    lastTrap = MathUtil.now();
-                }
-            } catch (Exception ignored) {} // somehow stp can be null sometimes?
+
+        if (!smartTrap.get()) return;
+        if (requireHole.get() && !Interactions.isInHole()) return;
+
+        for (PlayerEntity player : bedFags) {
+            if (player.squaredDistanceTo(mc.player) <= smartRange.get() * smartRange.get()) {
+                SelfTrapPlus selfTrapPlus = Modules.get().get(SelfTrapPlus.class);
+                if (!selfTrapPlus.isActive()) selfTrapPlus.toggle();
+                break;
+            }
         }
     }
 }
