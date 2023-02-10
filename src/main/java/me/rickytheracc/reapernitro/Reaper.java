@@ -21,8 +21,9 @@ public class Reaper extends MeteorAddon {
     @Override
     public void onInitialize() {
         log("Loading Reaper " + VERSION);
-        ML.load(); // load modules
-        SL.load(); // load services
+        ML.load(); // Load modules
+        SL.load(); // Load services
+
         if (!FOLDER.exists()) FOLDER.mkdirs(); // make sure folders exists
         if (!RECORDINGS.exists()) RECORDINGS.mkdirs();
         if (!ASSETS.exists()) ASSETS.mkdirs();

@@ -21,30 +21,34 @@ import net.minecraft.item.Items;
 
 public class ML { // Module loader
 
-    public static final Category R = new Category("Nitro Combat", Items.END_CRYSTAL.getDefaultStack());
-    public static final Category M = new Category("Nitro Misc.", Items.SKELETON_SKULL.getDefaultStack());
-    public static final Category C = new Category("Nitro Chat", Items.BOOK.getDefaultStack());
+    public static final Category R = new Category("Reaper Combat", Items.END_CRYSTAL.getDefaultStack());
+    public static final Category C = new Category("Reaper Chat", Items.BOOK.getDefaultStack());
+    public static final Category M = new Category("Reaper Misc.", Items.SKELETON_SKULL.getDefaultStack());
     public static final Category W = new Category("Windows", Items.GLASS_PANE.getDefaultStack());
 
     public static void register() {
         Reaper.log("Registering module categories.");
+
         Modules.registerCategory(R);
+        Modules.registerCategory(C);
         Modules.registerCategory(M);
         Modules.registerCategory(W);
     }
 
     public static void load() {
         long start = MathUtil.now();
-        Reaper.log("Loading modules and commands.");
-        loadR();
-        loadM();
+        Reaper.log("Loading modules...");
+
+        loadCombat();
+        loadChat();
+        loadMisc();
         loadW();
         loadH();
         Reaper.log("Loaded Reaper Nitro in " + MathUtil.millisElapsed(start));
     }
 
-
-    public static void loadR() { // load modules in reaper category
+    // Combat Moduels
+    public static void loadCombat() {
         addModules(
             new AnchorGod(),
             new AntiSurround(),
@@ -57,21 +61,22 @@ public class ML { // Module loader
         );
     }
 
-    public static void loadM() { // load modules in other categories
-        // chat
+    // Chat Modules
+    public static void loadChat() {
         addModules(
             new ArmorAlert(),
-            new AutoEZ(),
+            new AutoEasy(),
             new AutoLogin(),
             new BedAlerts(),
             new ChatTweaks(),
             new BreakAlert(),
             new NotifSettings(),
-            new PopCounter(),
-            new Welcomer()
+            new PopManager()
         );
+    }
 
-        // misc
+    // Misc Modules
+    public static void loadMisc() {
         addModules(
           new AntiAim(),
           new AutoRespawn(),
@@ -79,8 +84,6 @@ public class ML { // Module loader
           new ElytraBotThreaded(),
           new MultiTask(),
           new NoDesync(),
-          new NoProne(),
-          new OldAnimations(),
           new OneTap(),
           new PacketFly(),
           new RPC(),
@@ -95,7 +98,6 @@ public class ML { // Module loader
             new ExternalNotifications(),
             new ReaperHoleESP()
         );
-
     }
 
     public static void loadW() { // load modules in window category
@@ -105,6 +107,7 @@ public class ML { // Module loader
         );
     }
 
+    // Hud Modules
     public static void loadH() { // load hud modules
         Hud hud = Hud.get();
         hud.register(CustomImage.INFO);
