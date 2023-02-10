@@ -3,9 +3,10 @@
   "id": "reaper-nitro",
   "version": "${version}",
   "name": "Reaper Nitro",
-  "description": "The Best Meteor Addon",
+  "description": "The best meteor addon but improved by Ricky.",
   "authors": [
-    "NotGhostTypes"
+    "NotGhostTypes",
+    "RickyTheRacc"
   ],
   "contact": {
     "discord": "https://discord.gg/kKjSHnXVZv"
