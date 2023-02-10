@@ -1,4 +1,4 @@
-package me.rickytheracc.reapernitro.mixins.meteor;
+package me.rickytheracc.reapernitro.mixins;
 
 
 import me.rickytheracc.reapernitro.modules.chat.NotifSettings;

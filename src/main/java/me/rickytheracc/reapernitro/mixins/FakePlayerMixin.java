@@ -1,4 +1,4 @@
-package me.rickytheracc.reapernitro.mixins.meteor;
+package me.rickytheracc.reapernitro.mixins;
 
 import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.AnglePos;
@@ -12,6 +12,8 @@ import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
 import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.systems.modules.Categories;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.player.FakePlayer;
 import meteordevelopment.meteorclient.utils.entity.fakeplayer.FakePlayerManager;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
@@ -32,30 +34,21 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import static meteordevelopment.meteorclient.MeteorClient.mc;
-
 @Mixin(value = FakePlayer.class, remap = false)
-public class FakePlayerMixin {
-    @Shadow(remap = false)
-    @Final
-    private SettingGroup sgGeneral;
+public class FakePlayerMixin extends Module {
+    @Shadow(remap = false) @Final private SettingGroup sgGeneral;
+    @Shadow(remap = false) @Final public Setting<String> name;
 
-    @Shadow(remap = false)
-    @Final
-    public Setting<String> name;
+    @Unique private Setting<Boolean> loop = null;
+    @Unique private boolean recording = false;
+    @Unique private final List<AnglePos> posList = new ArrayList<>();
+    @Unique private final List<AnglePos> posList2 = new ArrayList<>();
+    @Unique private boolean playing = false;
+    @Unique private WTextBox b;
 
-    @Unique
-    private Setting<Boolean> loop = null;
-    @Unique
-    private boolean recording = false;
-    @Unique
-    private final List<AnglePos> posList = new ArrayList<>();
-    @Unique
-    private final List<AnglePos> posList2 = new ArrayList<>();
-    @Unique
-    private boolean playing = false;
-    @Unique
-    private WTextBox b;
+    public FakePlayerMixin() {
+        super(Categories.Player, "fake-player", "Spawns a client-side fake player for testing usages. No need to be active.");
+    }
 
     @Inject(method = "<init>", at = @At("TAIL"), remap = false)
     private void onInit(CallbackInfo ci) {

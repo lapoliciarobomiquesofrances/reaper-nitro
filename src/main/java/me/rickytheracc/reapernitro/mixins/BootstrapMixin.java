@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Main.class)
-public class Bootstrap {
+public class BootstrapMixin {
     @Inject(method = "main*", at = @At("HEAD"), remap = false)
     private static void doBootstrap(CallbackInfo ci) {
         Reaper.log("[Bootstrapper] Patching AWT properties");

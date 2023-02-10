@@ -1,4 +1,4 @@
-package me.rickytheracc.reapernitro.mixins.meteor;
+package me.rickytheracc.reapernitro.mixins;
 
 import meteordevelopment.meteorclient.gui.GuiTheme;
 import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
