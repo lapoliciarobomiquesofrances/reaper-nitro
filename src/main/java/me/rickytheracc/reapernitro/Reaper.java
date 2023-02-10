@@ -49,6 +49,6 @@ public class Reaper extends MeteorAddon {
     }
 
     public String getPackage() {
-        return "me.ghosttypes.reaper";
+        return "me.rickytheracc.reapernitro";
     }
 }
