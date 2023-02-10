@@ -58,7 +58,7 @@ public class ChatTweaks extends ReaperModule {
     public final Setting<String> prefixText = sgPrefix.add(new StringSetting.Builder()
         .name("prefix")
         .description("What the name in the prefix should be.")
-        .defaultValue("Reaper Nitro")
+        .defaultValue("Reaper")
         .visible(usePrefix::get)
         .onChanged(setting -> handlePrefix())
         .build()
@@ -67,7 +67,7 @@ public class ChatTweaks extends ReaperModule {
     public final Setting<SettingColor> prefixColor = sgPrefix.add(new ColorSetting.Builder()
         .name("prefix-color")
         .description("Color of the prefix text.")
-        .defaultValue(new SettingColor(255, 255, 255))
+        .defaultValue(new SettingColor(234, 76, 76))
         .visible(usePrefix::get)
         .onChanged(setting -> handlePrefix())
         .build()
@@ -110,7 +110,7 @@ public class ChatTweaks extends ReaperModule {
     );
 
     public ChatTweaks() {
-        super(ML.C, "chat-tweaks", "Various chat improvements.");
+        super(ML.C, "chat-tweaks", "Various tweaks to the chat and prefix controller.");
     }
 
     private String whisperSender;
