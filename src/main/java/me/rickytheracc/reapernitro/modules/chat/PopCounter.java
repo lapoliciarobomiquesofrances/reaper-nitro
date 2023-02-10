@@ -54,7 +54,7 @@ public class PopCounter extends ReaperModule {
 
 
     public PopCounter() {
-        super(ML.M, "pop-counter", "Count player's totem pops.");
+        super(ML.C, "pop-counter", "Count player's totem pops.");
     }
     private int announceWait;
 

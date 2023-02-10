@@ -60,7 +60,7 @@ public class BreakAlert extends ReaperModule {
 
     // Render
 
-    private final Setting<Boolean> chatWarning = sgGeneral.add(new BoolSetting.Builder()
+    private final Setting<Boolean> chatWarning = sgRender.add(new BoolSetting.Builder()
         .name("chat-warning")
         .description("Send a warning message in chat.")
         .defaultValue(false)
@@ -70,7 +70,7 @@ public class BreakAlert extends ReaperModule {
     private final Setting<Boolean> renderBlock = sgRender.add(new BoolSetting.Builder()
         .name("render-block")
         .description("Render the block being broken.")
-        .defaultValue(true)
+        .defaultValue(false)
         .build()
     );
 
@@ -101,14 +101,14 @@ public class BreakAlert extends ReaperModule {
     private final Setting<Boolean> renderText = sgRender.add(new BoolSetting.Builder()
         .name("render-name")
         .description("Will render the breaker's name over a breaking block.")
-        .defaultValue(false)
+        .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> threeD = sgRender.add(new BoolSetting.Builder()
         .name("3D-text")
         .description("Will make the text scale with distance.")
-        .defaultValue(true)
+        .defaultValue(false)
         .visible(renderText::get)
         .build()
     );
@@ -172,7 +172,7 @@ public class BreakAlert extends ReaperModule {
     private String lastMsg;
 
     public BreakAlert() {
-        super(ML.M, "break-alert", "Alerts you when one of your surround blocks is being broken.");
+        super(ML.C, "break-alert", "Alerts you when one of your surround blocks is being broken.");
     }
 
     @EventHandler

@@ -110,7 +110,7 @@ public class ChatTweaks extends ReaperModule {
     );
 
     public ChatTweaks() {
-        super(ML.M, "chat-tweaks", "Various chat improvements.");
+        super(ML.C, "chat-tweaks", "Various chat improvements.");
     }
 
     private String whisperSender;

@@ -34,7 +34,7 @@ public class AutoLogin extends ReaperModule {
     );
 
     public AutoLogin() {
-        super(ML.M, "auto-login", "Automatically log into servers that use /login.");
+        super(ML.C, "auto-login", "Automatically log into servers that use /login.");
     }
 
     private int messageDelay;

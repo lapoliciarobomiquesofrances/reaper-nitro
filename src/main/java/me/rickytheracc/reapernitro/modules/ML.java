@@ -21,9 +21,10 @@ import net.minecraft.item.Items;
 
 public class ML { // Module loader
 
-    public static final Category R = new Category("Nitro", Items.SKELETON_SKULL.getDefaultStack());
+    public static final Category R = new Category("Nitro Combat", Items.END_CRYSTAL.getDefaultStack());
     public static final Category M = new Category("Nitro Misc.", Items.SKELETON_SKULL.getDefaultStack());
-    public static final Category W = new Category("Windows", Items.SKELETON_SKULL.getDefaultStack());
+    public static final Category C = new Category("Nitro Chat", Items.BOOK.getDefaultStack());
+    public static final Category W = new Category("Windows", Items.GLASS_PANE.getDefaultStack());
 
     public static void register() {
         Reaper.log("Registering module categories.");

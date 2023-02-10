@@ -29,7 +29,7 @@ public class Welcomer extends ReaperModule {
 
 
     public Welcomer() {
-        super(ML.M, "welcomer", "Sends a message when somebody joins or leaves the server.");
+        super(ML.C, "welcomer", "Sends a message when somebody joins or leaves the server.");
     }
 
 

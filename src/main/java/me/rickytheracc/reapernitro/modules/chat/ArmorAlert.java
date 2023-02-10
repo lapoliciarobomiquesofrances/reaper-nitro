@@ -28,7 +28,7 @@ public class ArmorAlert extends ReaperModule {
     );
 
     public ArmorAlert() {
-        super(ML.M, "armor-alert", "Alerts you when your armor pieces are low.");
+        super(ML.C, "armor-alert", "Alerts you when your armor pieces are low.");
     }
 
     List<Integer> alertedSlots = new ArrayList<>();

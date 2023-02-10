@@ -73,7 +73,7 @@ public class BedAlerts extends ReaperModule {
     );
 
     public BedAlerts() {
-        super(ML.M, "bed-alerts", "Alerts you about nearby players with beds in their inventory.");
+        super(ML.C, "bed-alerts", "Alerts you about nearby players with beds in their inventory.");
     }
 
     private final ArrayList<PlayerEntity> bedFags = new ArrayList<>();

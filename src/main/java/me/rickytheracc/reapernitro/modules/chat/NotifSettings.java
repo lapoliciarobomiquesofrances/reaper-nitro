@@ -49,6 +49,6 @@ public class NotifSettings extends ReaperModule {
     );
 
     public NotifSettings() {
-        super(ML.M, "notifications", "Settings for hud notifications.");
+        super(ML.C, "notifications", "Settings for hud notifications.");
     }
 }
