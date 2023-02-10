@@ -6,7 +6,6 @@
     "MinecraftClientMixin",
     "Bootstrap",
     "meteor.FakePlayerMixin",
-    "meteor.MeteorBootstrap",
     "meteor.ChatUtilsMixin",
     "meteor.StringListSettingMixin"
   ],
