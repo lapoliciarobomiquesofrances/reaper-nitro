@@ -83,39 +83,39 @@ public class ReaperPlus extends MeteorAddon {
 
         // Load Modules
         log("Adding modules...");
-        Modules modules = Modules.get();
+        Modules mods = Modules.get();
 
-        modules.add(new AnchorGod());
-        modules.add(new BedGod());
-        modules.add(new TickShift());
-        modules.add(new QuickMend());
-        modules.add(new ReaperSurround());
-        modules.add(new ReaperSelfTrap());
-        modules.add(new SmartHoleFill());
+        mods.add(new AnchorGod());
+        mods.add(new BedGod());
+        mods.add(new TickShift());
+        mods.add(new QuickMend());
+        mods.add(new ReaperSurround());
+        mods.add(new ReaperSelfTrap());
+        mods.add(new SmartHoleFill());
 
-        modules.add(new ArmorAlert());
-        modules.add(new AutoEZ());
-        modules.add(new AutoLogin());
-        modules.add(new BedAlerts());
-        modules.add(new ChatTweaks());
-        modules.add(new BreakAlert());
-        modules.add(new NotifSettings());
-        modules.add(new PopCounter());
+        mods.add(new ArmorAlert());
+        mods.add(new AutoEZ());
+        mods.add(new AutoLogin());
+        mods.add(new BedAlerts());
+        mods.add(new ChatTweaks());
+        mods.add(new BreakAlert());
+        mods.add(new NotifSettings());
+        mods.add(new PopCounter());
 
-        modules.add(new AutoRespawn());
-        modules.add(new ChorusPredict());
-        modules.add(new ElytraBotThreaded());
-        modules.add(new MultiTask());
-        modules.add(new NoDesync());
-        modules.add(new OneTap());
-        modules.add(new PacketFly());
-        modules.add(new RPC());
-        modules.add(new StrictMove());
-        modules.add(new WideScaffold());
+        mods.add(new AutoRespawn());
+        mods.add(new ChorusPredict());
+        mods.add(new ElytraBotThreaded());
+        mods.add(new MultiTask());
+        mods.add(new NoDesync());
+        mods.add(new OneTap());
+        mods.add(new PacketFly());
+        mods.add(new RPC());
+        mods.add(new StrictMove());
+        mods.add(new WideScaffold());
 
-        modules.add(new ExternalFeed());
-        modules.add(new ExternalHUD());
-        modules.add(new ExternalNotifs());
+        mods.add(new ExternalFeed());
+        mods.add(new ExternalHUD());
+        mods.add(new ExternalNotifs());
 
         Hud hud = Hud.get();
         hud.register(CustomImage.INFO);
@@ -126,7 +126,7 @@ public class ReaperPlus extends MeteorAddon {
         log("Reaper loaded in " + (System.currentTimeMillis() - start) + "ms!");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() ->{
-            ReaperPlus.modules.shutdownNow();
+            modules.shutdownNow();
             cached.shutdownNow();
             scheduled.shutdownNow();
         }));
