@@ -28,7 +28,7 @@ public class ChatTweaks extends ReaperModule {
     );
 
     private final Setting<Boolean> cancelErrors = sgGeneral.add(new BoolSetting.Builder()
-        .name("cancel-reply-errors")
+        .name("cancel-errors")
         .description("Cancels the reply errors.")
         .defaultValue(true)
         .visible(easyReply::get)

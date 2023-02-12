@@ -2,14 +2,17 @@ package me.rickytheracc.reapernitro.modules.chat;
 
 import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.events.DeathEvent;
+import me.rickytheracc.reapernitro.util.combat.Statistics;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.services.GlobalManager.DeathEntry;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static me.rickytheracc.reapernitro.util.services.GlobalManager.deathEntries;
 
@@ -27,12 +30,12 @@ public class AutoEZ extends ReaperModule {
         .build()
     );
 
-    public final Setting<MessageMode> messageMode = sgGeneral.add(new EnumSetting.Builder<MessageMode>()
-        .name("message-mode")
-        .description("How the message should be sent, either normally or in priv messages.")
-        .defaultValue(MessageMode.Message)
-        .build()
-    );
+//    public final Setting<MessageMode> messageMode = sgGeneral.add(new EnumSetting.Builder<MessageMode>()
+//        .name("message-mode")
+//        .description("How the message should be sent, either normally or in priv messages.")
+//        .defaultValue(MessageMode.Message)
+//        .build()
+//    );
 
     public final Setting<Boolean> useKillstreak = sgGeneral.add(new BoolSetting.Builder()
         .name("killstreak")
@@ -73,63 +76,41 @@ public class AutoEZ extends ReaperModule {
         super(Reaper.C, "auto-ez", "Send a message when you kill somebody.");
     }
 
+    Random random = new Random();
+    private int announceWait;
+
+    @Override
+    public void onActivate() {
+        announceWait = 0;
+    }
+
     @EventHandler
-    public void onTick(TickEvent.Post event) {
-        if (deathEntries.isEmpty()) return;
-        ArrayList<DeathEntry> toRemove = new ArrayList<>();
-        for (DeathEntry entry : deathEntries) {
-            // Remove all entries that are older than 2.5 seconds
-            if (entry.getTime() + 2500 < System.currentTimeMillis()) toRemove.add(entry);
-        }
-        deathEntries.removeIf(toRemove::contains);
+    private void onTick(TickEvent.Post event) {
+        if (announceWait > 0) announceWait--;
     }
 
     @EventHandler
     public void onDeath(DeathEvent event) {
-        if (!event.wasTarget) return;
+        if (!event.wasTarget || announceWait > 0) return;
 
+        String name = event.name;
+        String message;
 
-    }
-
-//    @EventHandler
-//    public void onKill(DeathEvent.KillEvent event) {
-//        if (event.player == null) return;
-//        String name = target.getEntityName();
-//        if (MessageUtil.pendingEZ.contains(name)) return; // no duplicate messages
-//        Stats.addKill(name);
-//        String ezMessage = "GG {player}";
-//        DeathEntry entry = GlobalManager.getDeathEntry(name); // try to get the death entry
-//        if (entry != null) {
-//            int pops = entry.getPops();
-//            ezMessage = ezMessage.replace("{pops}", getFormattedPops(pops));
-//        } else { ezMessage = getFixedEZ(); } // if no entry, use a 'fixed' message
-//        ezMessage = ezMessage.replace("{player}", name); // add the player's name
-//        ezMessage = Formatter.applyPlaceholders(ezMessage); // apply client placeholders
-//        if (useKillstreak.get()) ezMessage += Formatter.getKillstreak(); // add killstreak
-//        if (useSuffix.get()) ezMessage += suffix.get(); // add suffix
-//        MessageUtil.sendEzMessage(name, ezMessage, ezDelay.get() * 1000, pmEz.get());
-//    }
-
-
-    public String getFixedEZ() {
-        for (String m : ezMessages.get()) if (!m.contains("{pops}")) return m;
-        return "GG {player}";
-    }
-
-    public String getFormattedPops(int pops) { // ex. Player died after popping {pops}
-        if (pops < 1) return "no totems";
-        if (pops == 1) return "1 totem";
-        return "totems";
-    }
-
-    public enum MessageMode {
-        Normal(""),
-        Whisper("/w "),
-        Message("/msg ");
-
-        MessageMode(String string) {
-
+        if (ezMessages.get().isEmpty()) {
+            message = "GG {player}!";
+            info("Your message list is empty! Using default message.");
+        } else {
+            int index = random.nextInt(0, ezMessages.get().size() - 1);
+            message = ezMessages.get().get(index);
         }
-    }
 
+        message = message.replace("{player}", name);
+        message = message.replace("{pops}", String.valueOf(event.pops));
+
+        if (useKillstreak.get()) message += " Killstreak: " + Statistics.getStreak();
+        if (useSuffix.get()) message += suffix.get(); // add suffix
+
+        ChatUtils.sendPlayerMsg(message);
+        announceWait = ezDelay.get();
+    }
 }

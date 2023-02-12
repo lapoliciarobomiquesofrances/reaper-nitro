@@ -13,20 +13,47 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class ExternalNotifs extends ReaperModule {
-
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
-    private final Setting<Boolean> chroma = sgGeneral.add(new BoolSetting.Builder().name("chroma").defaultValue(false).build());
-    private final Setting<Double> chromaSpeed = sgGeneral.add(new DoubleSetting.Builder().name("chroma-speed").defaultValue(0.01).min(0.000).sliderMax(1).build());
-    private final Setting<Integer> width = sgGeneral.add(new IntSetting.Builder().name("width").defaultValue(25).min(10).sliderMax(50).build());
-    private final Setting<Integer> height = sgGeneral.add(new IntSetting.Builder().name("height").defaultValue(30).min(20).sliderMax(50).build());
+    private final Setting<Boolean> chroma = sgGeneral.add(new BoolSetting.Builder()
+        .name("chroma")
+        .description("Make the notifications extra gamer.")
+        .defaultValue(false)
+        .build()
+    );
 
-    private ExternalRenderers.ExternalFrame externalFrame;
-    private RainbowColor rc = new RainbowColor();
+    private final Setting<Double> chromaSpeed = sgGeneral.add(new DoubleSetting.Builder()
+        .name("chroma-speed")
+        .description("How fast the chroma should be.")
+        .defaultValue(0.01)
+        .sliderMax(1)
+        .build()
+    );
+
+    private final Setting<Integer> width = sgGeneral.add(new IntSetting.Builder()
+        .name("width")
+        .description("The width of the external frame.")
+        .defaultValue(25)
+        .min(10)
+        .sliderMax(50)
+        .build()
+    );
+
+    private final Setting<Integer> height = sgGeneral.add(new IntSetting.Builder()
+        .name("height")
+        .description("The height of the external frame.")
+        .defaultValue(30)
+        .min(20)
+        .sliderMax(50)
+        .build()
+    );
 
     public ExternalNotifs() {
         super(Reaper.W, "external-notifications", "render notifications outside the client");
     }
+
+    private ExternalRenderers.ExternalFrame externalFrame;
+    private RainbowColor rc = new RainbowColor();
 
     @Override
     public void onActivate() {

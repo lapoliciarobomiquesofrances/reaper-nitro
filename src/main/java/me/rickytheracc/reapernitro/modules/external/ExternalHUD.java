@@ -34,19 +34,56 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ExternalHUD extends ReaperModule {
-
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgCoords = settings.createGroup("Coordinates");
     private final SettingGroup sgModules = settings.createGroup("Modules");
     private final SettingGroup sgPlayers = settings.createGroup("Players");
     private final SettingGroup sgSpotify = settings.createGroup("Spotify");
 
-    private final Setting<Boolean> debug = sgGeneral.add(new BoolSetting.Builder().name("debug").defaultValue(false).build());
-    private final Setting<Boolean> chroma = sgGeneral.add(new BoolSetting.Builder().name("chroma").defaultValue(false).build());
-    private final Setting<Double> chromaSpeed = sgGeneral.add(new DoubleSetting.Builder().name("chroma-speed").defaultValue(0.01).min(0.000).sliderMax(1).build());
-    private final Setting<Integer> width = sgGeneral.add(new IntSetting.Builder().name("width").defaultValue(25).min(10).sliderMax(50).build());
-    private final Setting<Integer> height = sgGeneral.add(new IntSetting.Builder().name("height").defaultValue(30).min(20).sliderMax(50).build());
-    public final Setting<SettingColor> backColor = sgGeneral.add(new ColorSetting.Builder().name("background-color").defaultValue(new SettingColor(15, 255, 211)).build());
+    // General
+
+    private final Setting<Boolean> debug = sgGeneral.add(new BoolSetting.Builder()
+        .name("debug")
+        .description("Send debug information about the module.")
+        .defaultValue(false)
+        .build()
+    );
+
+    private final Setting<Boolean> chroma = sgGeneral.add(new BoolSetting.Builder()
+        .name("chroma")
+        .defaultValue(false)
+        .build()
+    );
+
+    private final Setting<Double> chromaSpeed = sgGeneral.add(new DoubleSetting.Builder()
+        .name("chroma-speed")
+        .defaultValue(0.01)
+        .sliderMax(1)
+        .build()
+    );
+
+    private final Setting<Integer> width = sgGeneral.add(new IntSetting.Builder()
+        .name("width")
+        .defaultValue(25)
+        .min(10)
+        .sliderMax(50)
+        .build()
+    );
+
+    private final Setting<Integer> height = sgGeneral.add(new IntSetting.Builder()
+        .name("height")
+        .defaultValue(30)
+        .min(20)
+        .sliderMax(50)
+        .build()
+    );
+
+    public final Setting<SettingColor> backColor = sgGeneral.add(new ColorSetting.Builder()
+        .name("background-color")
+        .defaultValue(new SettingColor(15, 255, 211))
+        .build()
+    );
+
     private final Setting<Boolean> watermark = sgGeneral.add(new BoolSetting.Builder().name("watermark").defaultValue(false).build());
     private final Setting<Boolean> fps = sgGeneral.add(new BoolSetting.Builder().name("fps").defaultValue(false).build());
     private final Setting<Boolean> tps = sgGeneral.add(new BoolSetting.Builder().name("tps").defaultValue(false).build());
@@ -83,8 +120,10 @@ public class ExternalHUD extends ReaperModule {
         ExternalRenderers.activeFrames++;
         EventQueue.invokeLater(() -> { // external frames must *always* be started this way
             if (externalFrame == null) {
-                if (debug.get()) info("creating new external frame");
-                externalFrame = new ExternalRenderers.ExternalFrame(width.get(), height.get(), "Reaper " + Reaper.VERSION, this);
+                if (debug.get()) info("Creating new external frame");
+                externalFrame = new ExternalRenderers.ExternalFrame(
+                    width.get(), height.get(), "Reaper " + Reaper.VERSION, this
+                );
             }
             if (debug.get()) info("making frame visible");
             externalFrame.setVisible(true);

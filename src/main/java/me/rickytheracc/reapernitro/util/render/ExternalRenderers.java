@@ -15,9 +15,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class ExternalRenderers {
-
     public static int activeFrames = 0;
-
 
     public static int getUpdateFreq() {
         if (activeFrames < 1) return 15;
@@ -25,13 +23,11 @@ public class ExternalRenderers {
     }
 
     public static class ExternalWindow extends JPanel {
-        private ArrayList<String> text = new ArrayList<>();
+        private final ArrayList<String> text = new ArrayList<>();
         private Font font;
         private Color backColor = Color.BLACK;
         private Color textColor = Color.WHITE;
         private long lastRepaint = MathUtil.now() - 2500;
-
-        public ExternalWindow() {}
 
         public ExternalWindow(int w, int h) {this.set(w, h);}
 
@@ -55,7 +51,6 @@ public class ExternalRenderers {
             }
         }
 
-        public Color getTextColor() { return this.textColor; }
         public Color getBackColor() { return this.backColor; }
         public void setTextColor(Color c) { this.textColor = c; }
         public void setBackColor(Color c) {
@@ -124,7 +119,7 @@ public class ExternalRenderers {
         // proxy methods to modify the window responsible for this frame
         // modules should always access windows through the Frame class.
         public ArrayList<String> getText() {return window.getText();}
-        public Color getTextColor() {return window.getTextColor();}
+
         public void setText(ArrayList<String> body) {window.setText(body);}
         public void setTextColor(Color c) {window.setTextColor(c);}
         public void setBackColor(Color c) {window.setBackColor(c);}

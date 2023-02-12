@@ -6,12 +6,14 @@ import me.rickytheracc.reapernitro.events.DeathEvent;
 import me.rickytheracc.reapernitro.events.PlayerJoinEvent;
 import me.rickytheracc.reapernitro.events.PlayerLeaveEvent;
 import me.rickytheracc.reapernitro.events.PopEvent;
+import me.rickytheracc.reapernitro.modules.combat.*;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.game.GameJoinedEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
+import meteordevelopment.meteorclient.systems.modules.combat.*;
 import meteordevelopment.meteorclient.utils.PostInit;
 import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.orbit.EventHandler;
@@ -23,9 +25,7 @@ import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.UUID;
+import java.util.*;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
@@ -33,8 +33,21 @@ public class Statistics {
     private static final Collection<PlayerListEntry> prevPlayerList = new ArrayList<>();
     public static final Object2IntMap<UUID> totemPops = new Object2IntOpenHashMap<>();
     public static final Object2IntMap<UUID> playerDeaths = new Object2IntOpenHashMap<>();
-    public static ArrayList<String> killfeed = new ArrayList<>();
 
+    public static List<Module> combatModules = new ArrayList<>(Arrays.asList(
+        Modules.get().get(AnchorGod.class),
+        Modules.get().get(BedGod.class),
+        Modules.get().get(SmartHoleFill.class),
+        Modules.get().get(CrystalAura.class),
+        Modules.get().get(BedAura.class),
+        Modules.get().get(HoleFiller.class),
+        Modules.get().get(KillAura.class),
+        Modules.get().get(AutoAnvil.class),
+        Modules.get().get(AnchorAura.class),
+        Modules.get().get(AutoWeb.class)
+    ));
+
+    public static ArrayList<String> killfeed = new ArrayList<>();
     public static int kills = 0;
     public static int deaths = 0;
     public static int killStreak = 0;
@@ -56,6 +69,7 @@ public class Statistics {
 
         totemPops.clear();
         playerDeaths.clear();
+        killfeed.clear();
 
         if (!mc.isInSingleplayer()) {
             prevPlayerList.clear();
@@ -128,15 +142,9 @@ public class Statistics {
         if (event.packet instanceof EntityStatusS2CPacket packet && packet.getEntity(mc.world) instanceof PlayerEntity player) {
             // Deaths
             if (packet.getStatus() == 3) {
-                boolean wasTarget = false;
+                boolean wasTarget = targetCheck(player);
                 String name = player.getEntityName();
-                for (Module module : Modules.get().getActive()) {
-                    if (module.getInfoString() == null) continue;
-                    if (module.getInfoString().contains(name)) {
-                        wasTarget = true;
-                        break;
-                    }
-                }
+
 
                 if (player == mc.player) {
                     deaths++;
@@ -173,6 +181,9 @@ public class Statistics {
         if (event.packet instanceof DeathMessageS2CPacket packet) {
             Entity entity = mc.world.getEntityById(packet.getEntityId());
             if (entity instanceof PlayerEntity player) {
+                // Prevent sending 2 death events for players in render distance (hopefully)
+                if (mc.world.getPlayers().contains(player)) return;
+
                 int deaths = playerDeaths.getOrDefault(player.getUuid(), 0) + 1;
                 synchronized (playerDeaths) {totemPops.put(player.getUuid(), deaths);}
 
@@ -182,5 +193,19 @@ public class Statistics {
                 }
             }
         }
+    }
+
+    public static boolean targetCheck(PlayerEntity player) {
+        if (!mc.world.getPlayers().contains(player)) return false;
+        if (mc.player.squaredDistanceTo(player) > 30 * 30) return false;
+
+        String name = player.getEntityName();
+        for (Module module : combatModules) {
+            if (!module.isActive()) continue;
+            if (module.getInfoString() == null) continue;
+            if (module.getInfoString().contains(name)) return true;
+        }
+
+        return false;
     }
 }

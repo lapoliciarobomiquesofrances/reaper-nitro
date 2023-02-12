@@ -3,6 +3,7 @@ package me.rickytheracc.reapernitro.modules.chat;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import me.rickytheracc.reapernitro.Reaper;
+import me.rickytheracc.reapernitro.events.PopEvent;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.misc.Formatter;
 import me.rickytheracc.reapernitro.util.misc.MessageUtil;
@@ -13,98 +14,135 @@ import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.friends.Friends;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.util.Formatting;
 
 import java.util.*;
 
 public class PopCounter extends ReaperModule {
-
-
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgMessages = settings.createGroup("Messages");
-    //private final SettingGroup sgKillFX = settings.createGroup("KillFX");
+    private final SettingGroup sgAnnounce = settings.createGroup("Announce");
 
     // General
-    private final Setting<Boolean> popAlerts = sgGeneral.add(new BoolSetting.Builder().name("pop-alerts").description("Enable global pop notifications").defaultValue(false).build());
-    private final Setting<Boolean> deathAlerts = sgGeneral.add(new BoolSetting.Builder().name("death-alerts").description("Enable global death alerts.").defaultValue(false).build());
-    private final Setting<Boolean> removeAlerts = sgGeneral.add(new BoolSetting.Builder().name("remove-alerts").description("Enable global entity removal alerts.").defaultValue(false).build());
-    private final Setting<Boolean> own = sgGeneral.add(new BoolSetting.Builder().name("own").description("Notifies you of your own totem pops.").defaultValue(false).build());
-    private final Setting<Boolean> friends = sgGeneral.add(new BoolSetting.Builder().name("friends").description("Notifies you of your friends totem pops.").defaultValue(true).build());
-    private final Setting<Boolean> others = sgGeneral.add(new BoolSetting.Builder().name("others").description("Notifies you of other players totem pops.").defaultValue(true).build());
-    private final Setting<Boolean> announceOthers = sgGeneral.add(new BoolSetting.Builder().name("announce").description("Announce when other players pop.").defaultValue(false).visible(others::get).build());
-    public final Setting<Boolean> pmOthers = sgGeneral.add(new BoolSetting.Builder().name("pm").description("Message players when they pop a totem.").defaultValue(false).visible(announceOthers::get).build());
-    private final Setting<Integer> announceDelay = sgGeneral.add(new IntSetting.Builder().name("announce-delay").description("How many seconds between announcements.").defaultValue(5).min(1).sliderMax(100).visible(announceOthers::get).build());
-    private final Setting<Double> announceRange = sgGeneral.add(new DoubleSetting.Builder().name("announce-range").description("How close players need to be to announce pops or AutoEz.").defaultValue(3).min(0).sliderMax(10).visible(announceOthers::get).build());
-    private final Setting<Boolean> dontAnnounceFriends = sgGeneral.add(new BoolSetting.Builder().name("dont-announce-friends").description("Don't announce when your friends pop.").defaultValue(true).build());
-    public final Setting<Boolean> doPlaceholders = sgGeneral.add(new BoolSetting.Builder().name("placeholders").description("Enable global placeholders for pop messages.").defaultValue(false).build());
-    private final Setting<List<String>> popMessages = sgMessages.add(new StringListSetting.Builder().name("pop-messages").description("Messages to use when announcing pops.").defaultValue(Collections.emptyList()).build());
 
-    public final Object2IntMap<UUID> totemPops = new Object2IntOpenHashMap<>();
-    public final Object2IntMap<UUID> deathPops = new Object2IntOpenHashMap<>();
-    private final Object2IntMap<UUID> chatIds = new Object2IntOpenHashMap<>();
+    private final Setting<Boolean> despawn = sgGeneral.add(new BoolSetting.Builder()
+        .name("despawn-alerts")
+        .description("Alert you about players despawning.")
+        .defaultValue(false)
+        .build()
+    );
 
+    private final Setting<Boolean> self = sgGeneral.add(new BoolSetting.Builder()
+        .name("self")
+        .description("Notifies you of your own totem pops.")
+        .defaultValue(false)
+        .build()
+    );
 
+    private final Setting<Boolean> friends = sgGeneral.add(new BoolSetting.Builder()
+        .name("friends")
+        .description("Notifies you of your friends totem pops.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> others = sgGeneral.add(new BoolSetting.Builder()
+        .name("others")
+        .description("Notifies you of other players totem pops.")
+        .defaultValue(true)
+        .build()
+    );
+
+    // Announce
+
+    private final Setting<Boolean> announce = sgAnnounce.add(new BoolSetting.Builder()
+        .name("announce")
+        .description("Announce when other players pop.")
+        .defaultValue(false)
+        .visible(others::get)
+        .build()
+    );
+
+    private final Setting<Integer> messageDelay = sgAnnounce.add(new IntSetting.Builder()
+        .name("message-delay")
+        .description("Minimum ticks between sending messages.")
+        .defaultValue(100)
+        .sliderMax(500)
+        .min(0)
+        .visible(() -> announce.get() && others.get())
+        .build()
+    );
+
+    private final Setting<Double> announceRange = sgAnnounce.add(new DoubleSetting.Builder()
+        .name("announce-range")
+        .description("How close players need to be to announce pops or AutoEz.")
+        .defaultValue(3)
+        .min(0)
+        .sliderMax(10)
+        .visible(() -> announce.get() && others.get())
+        .build()
+    );
+
+    private final Setting<List<String>> popMessages = sgAnnounce.add(new StringListSetting.Builder()
+        .name("pop-messages")
+        .description("Messages to use when announcing pops.")
+        .defaultValue(Collections.emptyList())
+        .visible(() -> announce.get() && others.get())
+        .build()
+    );
 
     public PopCounter() {
         super(Reaper.C, "pop-counter", "Count player's totem pops.");
     }
+
+    private final Object2IntMap<UUID> chatIdMap = new Object2IntOpenHashMap<>();
+    private final Random random = new Random();
     private int announceWait;
 
     @Override
     public void onActivate() {
-        deathPops.clear();
-        totemPops.clear();
-        chatIds.clear();
-        announceWait = announceDelay.get() * 20;
-        if (popMessages.get().isEmpty()) {
-            warning("Your pop message list was empty, using the default message.");
-            popMessages.get().add("Ez pop {player}");
-        }
+        announceWait = 0;
     }
-
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        announceWait--;
-        synchronized (totemPops) {
-            for (PlayerEntity player : mc.world.getPlayers()) {
-                if (!totemPops.containsKey(player.getUuid())) continue;
-                if (player.deathTime > 0 || player.getHealth() <= 0) {
-                    UUID u = player.getUuid();
-                    int pops = totemPops.removeInt(u);
-                    sendPopAlert(player, pops, true);
-                    chatIds.removeInt(player.getUuid());
-                    if (deathPops.containsKey(u)) deathPops.removeInt(u); // update death pops
-                    deathPops.put(u, pops);
-                }
-            }
-        }
+        if (announceWait > 0) announceWait--;
     }
 
-
     @EventHandler
-    private void onGameJoin(GameJoinedEvent event) {
-        Stats.reset();
-        deathPops.clear();
-        totemPops.clear();
-        chatIds.clear();
+    private void onPop(PopEvent event) {
+        if (event.player == mc.player && !self.get()) return;
+        else if (Friends.get().isFriend(event.player) && !friends.get()) return;
+        else if (!others.get()) return;
+
+        ChatUtils.sendMsg(
+            getChatId(event.player), Formatting.GRAY,
+            "(highlight)%s (default)popped (highlight)%d (default)%s.",
+            event.name, event.pops, event.pops == 1 ? "totem" : "totems"
+        );
+        announceWait = messageDelay.get();
+    }
+
+    private int getChatId(Entity entity) {
+        return chatIdMap.computeIfAbsent(entity.getUuid(), value -> random.nextInt());
     }
 
     @EventHandler
     private void onEntityRemoved(EntityRemovedEvent event) {
+        if (!despawn.get()) return;
+
         if (event.entity instanceof PlayerEntity player) {
-            String n = player.getEntityName();
+            String name = player.getEntityName();
             UUID u = player.getUuid();
-            if (removeAlerts.get()) { // entity removal alerts
-                if (totemPops.containsKey(u)) {
-                    int pops = totemPops.getOrDefault(u, 0);
-                    info(n + " despawned after popping " + pops + getPopGrammar(pops) + ".");
-                } else {
-                    info(n + " despawned.");
-                }
+            if (totemPops.containsKey(u)) {
+                int pops = totemPops.getOrDefault(u, 0);
+                info(n + " despawned after popping " + pops + getPopGrammar(pops) + ".");
+            } else {
+                info(n + " despawned.");
             }
         }
     }
@@ -131,7 +169,7 @@ public class PopCounter extends ReaperModule {
                 totemPops.put(e.getUuid(), ++pops);
                 sendPopAlert(pl , pops, false);
             }
-            if (announceOthers.get() && mc.player.distanceTo(e) <= announceRange.get() && announceWait <= 0) { // handle announcing
+            if (announce.get() && mc.player.distanceTo(e) <= announceRange.get() && announceWait <= 0) { // handle announcing
                 if (isFriend && !dontAnnounceFriends.get()) return;
                 String popMessage = getPopMessage(pl);
                 String name = pl.getEntityName();
@@ -139,7 +177,7 @@ public class PopCounter extends ReaperModule {
                 //if (suffix.get()) popMessage = popMessage + Formatter.getSuffix();
 //                MessageUtil.sendClientMessage(popMessage);
                 if (pmOthers.get()) MessageUtil.sendDM(name, popMessage);
-                announceWait = announceDelay.get() * 20;
+                announceWait = messageDelay.get() * 20;
             }
         }
     }

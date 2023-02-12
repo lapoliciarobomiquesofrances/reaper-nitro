@@ -53,13 +53,14 @@ public class Reaper extends MeteorAddon {
     public void onInitialize() {
         long start = MathUtil.now();
         log("Loading Reaper " + VERSION);
+        System.setProperty("java.awt.headless", "false");
 
-        // Make sure directories exist
-        log("Creating folders...");
-        if (!FOLDER.exists()) FOLDER.mkdirs();
-        if (!RECORDINGS.exists()) RECORDINGS.mkdirs();
-        if (!ASSETS.exists()) ASSETS.mkdirs();
-        if (!USER_ASSETS.exists()) USER_ASSETS.mkdirs();
+//        // Make sure directories exist
+//        log("Creating folders...");
+//        if (!FOLDER.exists()) FOLDER.mkdirs();
+//        if (!RECORDINGS.exists()) RECORDINGS.mkdirs();
+//        if (!ASSETS.exists()) ASSETS.mkdirs();
+//        if (!USER_ASSETS.exists()) USER_ASSETS.mkdirs();
 
         // Init services
         log("Creating threads...");
