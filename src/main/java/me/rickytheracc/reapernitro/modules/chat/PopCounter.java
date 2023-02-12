@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.events.PopEvent;
 import me.rickytheracc.reapernitro.util.combat.Statistics;
+import me.rickytheracc.reapernitro.util.misc.MessageUtil2;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.entity.EntityRemovedEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -59,6 +60,22 @@ public class PopCounter extends ReaperModule {
         .description("Announce when other players pop.")
         .defaultValue(false)
         .visible(others::get)
+        .build()
+    );
+
+    private final Setting<Boolean> packet = sgAnnounce.add(new BoolSetting.Builder()
+        .name("packet")
+        .description("Send the messages with packets so only other players see them.")
+        .defaultValue(false)
+        .visible(() -> announce.get() && others.get())
+        .build()
+    );
+
+    private final Setting<Boolean> privateMessage = sgAnnounce.add(new BoolSetting.Builder()
+        .name("private")
+        .description("Use /msg to dm the players the pop message.")
+        .defaultValue(true)
+        .visible(() -> announce.get() && others.get())
         .build()
     );
 
@@ -130,7 +147,8 @@ public class PopCounter extends ReaperModule {
             message = message.replace("{player}", event.name);
             message = message.replace("{pops}", String.valueOf(event.pops));
 
-            ChatUtils.sendPlayerMsg(message);
+            if (!privateMessage.get()) MessageUtil2.sendNormalMessage(message, packet.get());
+            else MessageUtil2.sendPrivateMessage(message, event.name, packet.get());
             announceWait = messageDelay.get();
         }
 

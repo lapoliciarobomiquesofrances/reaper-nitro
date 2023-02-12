@@ -3,18 +3,14 @@ package me.rickytheracc.reapernitro.modules.chat;
 import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.events.DeathEvent;
 import me.rickytheracc.reapernitro.util.combat.Statistics;
+import me.rickytheracc.reapernitro.util.misc.MessageUtil2;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
-import me.rickytheracc.reapernitro.util.services.GlobalManager.DeathEntry;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import static me.rickytheracc.reapernitro.util.services.GlobalManager.deathEntries;
 
 public class AutoEZ extends ReaperModule {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -30,12 +26,19 @@ public class AutoEZ extends ReaperModule {
         .build()
     );
 
-//    public final Setting<MessageMode> messageMode = sgGeneral.add(new EnumSetting.Builder<MessageMode>()
-//        .name("message-mode")
-//        .description("How the message should be sent, either normally or in priv messages.")
-//        .defaultValue(MessageMode.Message)
-//        .build()
-//    );
+    private final Setting<Boolean> packet = sgGeneral.add(new BoolSetting.Builder()
+        .name("packet")
+        .description("Send the messages with packets so only other players see them.")
+        .defaultValue(false)
+        .build()
+    );
+
+    private final Setting<Boolean> privateMessage = sgGeneral.add(new BoolSetting.Builder()
+        .name("private")
+        .description("Use /msg to dm the players the ez message.")
+        .defaultValue(true)
+        .build()
+    );
 
     public final Setting<Boolean> useKillstreak = sgGeneral.add(new BoolSetting.Builder()
         .name("killstreak")
@@ -110,7 +113,9 @@ public class AutoEZ extends ReaperModule {
         if (useKillstreak.get()) message += " Killstreak: " + Statistics.getStreak();
         if (useSuffix.get()) message += suffix.get(); // add suffix
 
-        ChatUtils.sendPlayerMsg(message);
+        if (!privateMessage.get()) MessageUtil2.sendNormalMessage(message, packet.get());
+        else MessageUtil2.sendPrivateMessage(message, event.name, packet.get());
+
         announceWait = ezDelay.get();
     }
 }
