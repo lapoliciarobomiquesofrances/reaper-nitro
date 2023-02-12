@@ -50,7 +50,7 @@ public class ReaperPlus extends MeteorAddon {
 
     @Override
     public void onInitialize() {
-        long start = MathUtil.now();
+        long start = System.currentTimeMillis();
         log("Loading Reaper " + VERSION);
         System.setProperty("java.awt.headless", "false");
 

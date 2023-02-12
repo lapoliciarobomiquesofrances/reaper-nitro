@@ -39,7 +39,7 @@ public class CustomImage extends HudElement {
     private final Setting<Double> chromaSpeed = sgGeneral.add(new DoubleSetting.Builder().name("speed").defaultValue(0.09).min(0.01).sliderMax(5).decimalPlaces(2).visible(chroma::get).build());
     private final Setting<SettingColor> color = sgGeneral.add(new ColorSetting.Builder().name("background-color").defaultValue(new SettingColor(255, 255, 255)).visible(() -> !chroma.get()).build());
 
-    private long lastRefresh = MathUtil.now();
+    private long lastRefresh = System.currentTimeMillis();
 
     public CustomImage() {
         super(INFO);
@@ -62,7 +62,7 @@ public class CustomImage extends HudElement {
         int h = getHeight();
 
         if (update.get() && logoMode.get() == LogoMode.URL && MathUtil.msPassed(lastRefresh) >= updateDelay.get() * 1000) { // updating from URL
-            lastRefresh = MathUtil.now();
+            lastRefresh = System.currentTimeMillis();
             setTexture();
         }
 

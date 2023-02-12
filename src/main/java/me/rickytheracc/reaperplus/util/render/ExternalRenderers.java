@@ -27,7 +27,7 @@ public class ExternalRenderers {
         private Font font;
         private Color backColor = Color.BLACK;
         private Color textColor = Color.WHITE;
-        private long lastRepaint = MathUtil.now() - 2500;
+        private long lastRepaint = System.currentTimeMillis() - 2500;
 
         public ExternalWindow(int w, int h) {this.set(w, h);}
 
@@ -47,7 +47,7 @@ public class ExternalRenderers {
             text.addAll(body);
             if (MathUtil.msPassed(lastRepaint) > getUpdateFreq()) { // dynamically reduces the update frequency based on how many external windows are open
                 this.repaint();
-                lastRepaint = MathUtil.now();
+                lastRepaint = System.currentTimeMillis();
             }
         }
 

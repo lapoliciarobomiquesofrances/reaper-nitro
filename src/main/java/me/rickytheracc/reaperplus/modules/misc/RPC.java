@@ -52,7 +52,7 @@ public class RPC extends ReaperModule {
         checkMeteorRPC();
         DiscordIPC.start(919264957172973570L, null);
         rpc.setStart(System.currentTimeMillis() / 1000L);
-        rgbTimer = MathUtil.intToTicks(rgbDelay.get());
+        rgbTimer = MathUtil.secondsToTicks(rgbDelay.get());
         if (rgbLogo.get()) {
             rpc.setLargeImage("rpc_red", "Reaper " + ReaperPlus.VERSION);
             rgb_i++;
@@ -88,14 +88,14 @@ public class RPC extends ReaperModule {
         if (rgbLogo.get()) {
             rgbTimer--;
             if (rgbTimer <= 0) {
-                rgbTimer = MathUtil.intToTicks(rgbDelay.get());
+                rgbTimer = MathUtil.secondsToTicks(rgbDelay.get());
                 if (rgb_i >= rgb_names.size()) rgb_i = 0;
                 setImage(rgb_names.get(rgb_i));
                 rgb_i++;
             }
         }
 
-        if (updateTimer <= 0) updateTimer = MathUtil.intToTicks(delay.get());
+        if (updateTimer <= 0) updateTimer = MathUtil.secondsToTicks(delay.get());
         else return;
 
         List<String> mainText = messages.get();

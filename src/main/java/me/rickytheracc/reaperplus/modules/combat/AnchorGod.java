@@ -625,7 +625,7 @@ public class AnchorGod extends ReaperModule {
         AnchorPlacement placement = new AnchorPlacement(); // init the placements
         AnchorPlacement finalPlacement = new AnchorPlacement();
         double bestDamage = 0;
-        long start = MathUtil.now();
+        long start = System.currentTimeMillis();
         int calcs = 0;
         if (debug.get()) info("place calculation started");
         for (BlockPos p : toScan) {
