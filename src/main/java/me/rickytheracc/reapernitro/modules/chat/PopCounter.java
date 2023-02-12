@@ -4,13 +4,9 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.events.PopEvent;
+import me.rickytheracc.reapernitro.util.combat.Statistics;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
-import me.rickytheracc.reapernitro.util.misc.Formatter;
-import me.rickytheracc.reapernitro.util.misc.MessageUtil;
-import me.rickytheracc.reapernitro.util.player.Stats;
 import meteordevelopment.meteorclient.events.entity.EntityRemovedEvent;
-import meteordevelopment.meteorclient.events.game.GameJoinedEvent;
-import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.friends.Friends;
@@ -18,7 +14,6 @@ import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.util.Formatting;
 
 import java.util.*;
@@ -77,19 +72,19 @@ public class PopCounter extends ReaperModule {
         .build()
     );
 
-    private final Setting<Double> announceRange = sgAnnounce.add(new DoubleSetting.Builder()
+    private final Setting<Double> range = sgAnnounce.add(new DoubleSetting.Builder()
         .name("announce-range")
-        .description("How close players need to be to announce pops or AutoEz.")
-        .defaultValue(3)
+        .description("How close players need to be to announce pops.")
+        .defaultValue(8)
         .min(0)
-        .sliderMax(10)
+        .sliderMax(20)
         .visible(() -> announce.get() && others.get())
         .build()
     );
 
     private final Setting<List<String>> popMessages = sgAnnounce.add(new StringListSetting.Builder()
         .name("pop-messages")
-        .description("Messages to use when announcing pops.")
+        .description("Messages to use when announcing pops. Use {pops} and {player} to reference the target.")
         .defaultValue(Collections.emptyList())
         .visible(() -> announce.get() && others.get())
         .build()
@@ -105,6 +100,7 @@ public class PopCounter extends ReaperModule {
 
     @Override
     public void onActivate() {
+        chatIdMap.clear();
         announceWait = 0;
     }
 
@@ -118,13 +114,31 @@ public class PopCounter extends ReaperModule {
         if (event.player == mc.player && !self.get()) return;
         else if (Friends.get().isFriend(event.player) && !friends.get()) return;
         else if (!others.get()) return;
+        else if (announce.get() && announceWait <= 0 && event.wasTarget) {
+            if (mc.player.squaredDistanceTo(event.player) > range.get() * range.get()) return;
+
+            String message;
+
+            if (popMessages.get().isEmpty()) {
+                message = "{player} popped {pops} totems to Reaper Nitro!";
+                warning("Your pop messages list is empty. Please add messages!");
+            } else {
+                int index = random.nextInt(0, popMessages.get().size() - 1);
+                message = popMessages.get().get(index);
+            }
+
+            message = message.replace("{player}", event.name);
+            message = message.replace("{pops}", String.valueOf(event.pops));
+
+            ChatUtils.sendPlayerMsg(message);
+            announceWait = messageDelay.get();
+        }
 
         ChatUtils.sendMsg(
             getChatId(event.player), Formatting.GRAY,
             "(highlight)%s (default)popped (highlight)%d (default)%s.",
             event.name, event.pops, event.pops == 1 ? "totem" : "totems"
         );
-        announceWait = messageDelay.get();
     }
 
     private int getChatId(Entity entity) {
@@ -136,93 +150,10 @@ public class PopCounter extends ReaperModule {
         if (!despawn.get()) return;
 
         if (event.entity instanceof PlayerEntity player) {
-            String name = player.getEntityName();
-            UUID u = player.getUuid();
-            if (totemPops.containsKey(u)) {
-                int pops = totemPops.getOrDefault(u, 0);
-                info(n + " despawned after popping " + pops + getPopGrammar(pops) + ".");
-            } else {
-                info(n + " despawned.");
-            }
+            int pops = Statistics.getPops(player);
+            if (pops == 0) return;
+
+            info(name + " despawned after popping " + pops + ((pops >= 1) ? "totems" : "totem") + ".");
         }
-    }
-
-
-    @EventHandler
-    private void onReceivePacket(PacketEvent.Receive event) {
-        if (event.packet instanceof EntityStatusS2CPacket packet && packet.getStatus() == 35) { // pop tracking
-            Entity e = packet.getEntity(mc.world);
-            PlayerEntity pl = null;
-            boolean isFriend = false;
-            if (e == null) { // null check
-                return;
-            } else if (e instanceof PlayerEntity p) { // make sure it's a player
-                pl = p;
-                isFriend = Friends.get().isFriend(p); // self, friend, others check
-                if (p.equals(mc.player) && !own.get()) return;
-                if (isFriend && !friends.get()) return;
-                if (!others.get() && !isFriend && !p.equals(mc.player)) return;
-            }
-            if (pl == null) return; // double-check 'cached' player
-            synchronized (totemPops) { // update totem pop database
-                int pops = totemPops.getOrDefault(e.getUuid(), 0);
-                totemPops.put(e.getUuid(), ++pops);
-                sendPopAlert(pl , pops, false);
-            }
-            if (announce.get() && mc.player.distanceTo(e) <= announceRange.get() && announceWait <= 0) { // handle announcing
-                if (isFriend && !dontAnnounceFriends.get()) return;
-                String popMessage = getPopMessage(pl);
-                String name = pl.getEntityName();
-                if (doPlaceholders.get()) popMessage = Formatter.applyPlaceholders(popMessage);
-                //if (suffix.get()) popMessage = popMessage + Formatter.getSuffix();
-//                MessageUtil.sendClientMessage(popMessage);
-                if (pmOthers.get()) MessageUtil.sendDM(name, popMessage);
-                announceWait = messageDelay.get() * 20;
-            }
-        }
-    }
-
-
-
-
-    private String getPopAlert(PlayerEntity p, int pops, boolean died) {
-        String popAlert;
-        if (died) popAlert = p.getEntityName() + " died after popping " + pops + getPopGrammar(pops);
-        else popAlert = p.getEntityName() + " popped " + pops + getPopGrammar(pops);
-        return popAlert;
-    }
-
-    private void sendPopAlert(PlayerEntity p, int pops, boolean died) {
-        String popAlert = getPopAlert(p, pops, died);
-        if (!popAlerts.get() && popAlert.contains("popped")) return;
-        if (!deathAlerts.get() && popAlert.contains("died")) return;
-        info(getPopAlert(p, pops, died));
-    }
-
-    private String getPopGrammar(int pops) {
-        if (pops <= 1) return " totem";
-        else return " totems";
-    }
-
-    private String getPopMessage(PlayerEntity p) {
-        if (popMessages.get().isEmpty()) return "Ez pop {player}";
-        String playerName = p.getEntityName();
-        String popMessage = popMessages.get().get(new Random().nextInt(popMessages.get().size()));
-        if (popMessage.contains("{pops}") && totemPops.containsKey(p.getUuid())) {
-            int pops = totemPops.getOrDefault(p.getUuid(), 0);
-            popMessage = popMessage.replace("{pops}", pops + " " + getPopGrammar(pops));
-        } else {
-            boolean f = false;
-            for (String s : popMessages.get()) {
-                if (!s.contains("{pops}")) {
-                    f = true;
-                    popMessage = s;
-                    break;
-                }
-            }
-            if (!f) popMessage = "Ez pop {player}";
-        }
-        if (popMessage.contains("{player}")) popMessage = popMessage.replace("{player}", playerName);
-        return popMessage;
     }
 }

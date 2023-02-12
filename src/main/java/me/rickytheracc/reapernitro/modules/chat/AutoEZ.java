@@ -98,7 +98,7 @@ public class AutoEZ extends ReaperModule {
 
         if (ezMessages.get().isEmpty()) {
             message = "GG {player}!";
-            info("Your message list is empty! Using default message.");
+            info("Your message list is empty. Please add messages!");
         } else {
             int index = random.nextInt(0, ezMessages.get().size() - 1);
             message = ezMessages.get().get(index);

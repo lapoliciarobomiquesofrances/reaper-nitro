@@ -171,9 +171,10 @@ public class Statistics {
             // Pops
             if (packet.getStatus() == 35) {
                 synchronized (totemPops) {
+                    boolean wasTarget = targetCheck(player);
                     int pops = totemPops.getOrDefault(player.getUuid(), 0) + 1;
-                    playerDeaths.put(player.getUuid(), pops);
-                    MeteorClient.EVENT_BUS.post(PopEvent.get(player, pops));
+                    totemPops.put(player.getUuid(), pops);
+                    MeteorClient.EVENT_BUS.post(PopEvent.get(player, pops, wasTarget));
                 }
             }
         }
