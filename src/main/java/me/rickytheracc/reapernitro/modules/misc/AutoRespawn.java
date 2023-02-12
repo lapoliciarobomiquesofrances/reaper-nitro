@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.misc;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.misc.MessageUtil;
 import me.rickytheracc.reapernitro.util.player.Stats;
@@ -16,12 +16,17 @@ import java.util.List;
 import java.util.Random;
 
 public class AutoRespawn extends ReaperModule {
-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgRekit = settings.createGroup("Rekit");
     private final SettingGroup sgExcuse = settings.createGroup("AutoExcuse");
     private final SettingGroup sgHS = settings.createGroup("HighScore");
 
-    private final Setting<Boolean> rekit = sgRekit.add(new BoolSetting.Builder().name("rekit").description("Rekit after dying on pvp servers.").defaultValue(false).build());
+    private final Setting<Boolean> rekit = sgRekit.add(new BoolSetting.Builder()
+        .name("rekit")
+        .description("Rekit after dying on pvp servers.")
+        .defaultValue(false)
+        .build()
+    );
+
     private final Setting<String> kitName = sgRekit.add(new StringSetting.Builder().name("kit-name").description("The name of your kit.").defaultValue("default").build());
 
     private final Setting<Boolean> excuse = sgExcuse.add(new BoolSetting.Builder().name("excuse").description("Send an excuse to global chat after death.").defaultValue(false).build());
@@ -41,7 +46,7 @@ public class AutoRespawn extends ReaperModule {
     private int messageI = 0;
 
     public AutoRespawn() {
-        super(ML.M, "auto-respawn", "Automatically respawns after death.");
+        super(Reaper.M, "auto-respawn", "Automatically respawns after death.");
     }
 
     @Override

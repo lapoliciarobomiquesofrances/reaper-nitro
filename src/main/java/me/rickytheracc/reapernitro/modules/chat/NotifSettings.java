@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.chat;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.IntSetting;
@@ -49,6 +49,6 @@ public class NotifSettings extends ReaperModule {
     );
 
     public NotifSettings() {
-        super(ML.C, "notifications", "Settings for hud notifications.");
+        super(Reaper.C, "notifications", "Settings for hud notifications.");
     }
 }

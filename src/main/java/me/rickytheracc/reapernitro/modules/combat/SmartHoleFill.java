@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.combat;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.player.Interactions;
 import me.rickytheracc.reapernitro.util.world.BlockHelper;
@@ -63,7 +63,7 @@ public class SmartHoleFill extends ReaperModule {
     public final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder().name("line-color").defaultValue(new SettingColor(114, 11, 135)).build());
 
     public SmartHoleFill() {
-        super(ML.R, "smart-holefill", "Hole fill but smart");
+        super(Reaper.R, "smart-holefill", "Hole fill but smart");
     }
 
     private int delayTimer = 0;

@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.combat;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.player.Interactions;
 import me.rickytheracc.reapernitro.util.world.BlockHelper;
@@ -78,7 +78,7 @@ public class SelfTrapPlus extends ReaperModule {
 
 
     public SelfTrapPlus(){
-        super(ML.R, "self-trap-plus", "Places obsidian around your head.");
+        super(Reaper.R, "self-trap-plus", "Places obsidian around your head.");
     }
 
     @Override

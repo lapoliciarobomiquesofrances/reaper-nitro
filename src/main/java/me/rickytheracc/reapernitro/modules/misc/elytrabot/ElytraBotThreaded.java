@@ -1,7 +1,7 @@
 package me.rickytheracc.reapernitro.modules.misc.elytrabot;
 
 import baritone.api.BaritoneAPI;
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.modules.misc.elytrabot.utils.*;
 import meteordevelopment.meteorclient.MeteorClient;
@@ -274,7 +274,7 @@ public class ElytraBotThreaded extends ReaperModule {
 
 
     public ElytraBotThreaded() {
-        super(ML.M, "elytra-bot", "Elytra AutoPilot");
+        super(Reaper.M, "elytra-bot", "Elytra AutoPilot");
     }
 
     @Override

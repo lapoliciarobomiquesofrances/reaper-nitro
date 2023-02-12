@@ -1,7 +1,7 @@
 package me.rickytheracc.reapernitro.util.network;
 
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.player.Interactions;
-import me.rickytheracc.reapernitro.util.services.TL;
 import me.rickytheracc.reapernitro.util.world.CombatHelper;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.Rotations;
@@ -120,7 +120,7 @@ public class PacketManager {
     }
 
     public static void sendInteract(Hand hand, BlockHitResult result, boolean packet) {
-        TL.modules.execute(() -> {
+        Reaper.modules.execute(() -> {
             pendingPlaces.add(result);
             try {Thread.sleep(60);} catch (Exception ignored) {}
             pendingPlaces.remove(result);

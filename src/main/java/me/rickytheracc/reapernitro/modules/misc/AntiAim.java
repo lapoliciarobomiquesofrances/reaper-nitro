@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.misc;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.modules.combat.BedGod;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.player.Interactions;
@@ -25,7 +25,7 @@ public class AntiAim extends ReaperModule {
     private final Setting<Integer> pSpeed = sgDefault.add(new IntSetting.Builder().name("speed").description("The speed at which you rotate.").defaultValue(5).range(1, 100).visible(pitch::get).build());
 
     public AntiAim() {
-        super(ML.M, "anti-aim", "Makes your head spin around");
+        super(Reaper.M, "anti-aim", "Makes your head spin around");
     }
 
     private short count = 0;

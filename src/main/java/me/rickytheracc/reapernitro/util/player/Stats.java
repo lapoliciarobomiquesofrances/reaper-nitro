@@ -12,9 +12,7 @@ public class Stats {
     public static int killStreak = 0;
     public static int highscore = 0;
     public static ArrayList<String> killfeed = new ArrayList<>();
-    //public static long rpcStart = System.currentTimeMillis() / 1000L;
     public static long startTime = System.currentTimeMillis();
-    //public static String onlineUsers = "";
 
     public static void reset() {
         kills = 0;

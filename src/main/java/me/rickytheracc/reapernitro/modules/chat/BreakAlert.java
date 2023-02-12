@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.chat;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.modules.combat.ReaperSurround;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.world.BlockHelper;
@@ -14,6 +14,7 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.friends.Friends;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.combat.Surround;
+import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.render.NametagUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
@@ -172,11 +173,13 @@ public class BreakAlert extends ReaperModule {
     private String lastMsg;
 
     public BreakAlert() {
-        super(ML.C, "break-alert", "Alerts you when one of your surround blocks is being broken.");
+        super(Reaper.C, "break-alert", "Alerts you when one of your surround blocks is being broken.");
     }
 
     @EventHandler
     private void onPacketReceive(PacketEvent.Receive event) {
+        if (!Utils.canUpdate()) return;
+
         if (event.packet instanceof BlockBreakingProgressS2CPacket packet) {
             if (!surround.isActive() && !reaperSurround.isActive() && onlyOnSurround.get()) return;
             if (debug.get()) info("Received block break progress packet, checking");

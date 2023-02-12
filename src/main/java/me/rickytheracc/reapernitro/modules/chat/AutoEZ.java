@@ -1,17 +1,12 @@
 package me.rickytheracc.reapernitro.modules.chat;
 
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.events.DeathEvent;
-import me.rickytheracc.reapernitro.modules.ML;
-import me.rickytheracc.reapernitro.util.misc.Formatter;
-import me.rickytheracc.reapernitro.util.misc.MessageUtil;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
-import me.rickytheracc.reapernitro.util.player.Stats;
-import me.rickytheracc.reapernitro.util.services.GlobalManager;
 import me.rickytheracc.reapernitro.util.services.GlobalManager.DeathEntry;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,13 +63,14 @@ public class AutoEZ extends ReaperModule {
             "At least your totem knows what it's doing!",
             "Could you try harder? I'm getting bored...",
             "Reaper Nitro owns me and all :yawn:",
-            "You have to be trying to be this bad right?"
+            "You have to be trying to be this bad right?",
+            "At this point you should honestly just give up."
         )
         .build()
     );
 
     public AutoEZ() {
-        super(ML.M, "auto-ez", "Send a message when you kill somebody.");
+        super(Reaper.C, "auto-ez", "Send a message when you kill somebody.");
     }
 
     @EventHandler
@@ -89,23 +85,30 @@ public class AutoEZ extends ReaperModule {
     }
 
     @EventHandler
-    public void onKill(DeathEvent.KillEvent event) {
-        if (event.player == null) return;
-        String name = target.getEntityName();
-        if (MessageUtil.pendingEZ.contains(name)) return; // no duplicate messages
-        Stats.addKill(name);
-        String ezMessage = "GG {player}";
-        DeathEntry entry = GlobalManager.getDeathEntry(name); // try to get the death entry
-        if (entry != null) {
-            int pops = entry.getPops();
-            ezMessage = ezMessage.replace("{pops}", getFormattedPops(pops));
-        } else { ezMessage = getFixedEZ(); } // if no entry, use a 'fixed' message
-        ezMessage = ezMessage.replace("{player}", name); // add the player's name
-        ezMessage = Formatter.applyPlaceholders(ezMessage); // apply client placeholders
-        if (useKillstreak.get()) ezMessage += Formatter.getKillstreak(); // add killstreak
-        if (useSuffix.get()) ezMessage += suffix.get(); // add suffix
-        MessageUtil.sendEzMessage(name, ezMessage, ezDelay.get() * 1000, pmEz.get());
+    public void onDeath(DeathEvent event) {
+        if (!event.wasTarget) return;
+
+
     }
+
+//    @EventHandler
+//    public void onKill(DeathEvent.KillEvent event) {
+//        if (event.player == null) return;
+//        String name = target.getEntityName();
+//        if (MessageUtil.pendingEZ.contains(name)) return; // no duplicate messages
+//        Stats.addKill(name);
+//        String ezMessage = "GG {player}";
+//        DeathEntry entry = GlobalManager.getDeathEntry(name); // try to get the death entry
+//        if (entry != null) {
+//            int pops = entry.getPops();
+//            ezMessage = ezMessage.replace("{pops}", getFormattedPops(pops));
+//        } else { ezMessage = getFixedEZ(); } // if no entry, use a 'fixed' message
+//        ezMessage = ezMessage.replace("{player}", name); // add the player's name
+//        ezMessage = Formatter.applyPlaceholders(ezMessage); // apply client placeholders
+//        if (useKillstreak.get()) ezMessage += Formatter.getKillstreak(); // add killstreak
+//        if (useSuffix.get()) ezMessage += suffix.get(); // add suffix
+//        MessageUtil.sendEzMessage(name, ezMessage, ezDelay.get() * 1000, pmEz.get());
+//    }
 
 
     public String getFixedEZ() {

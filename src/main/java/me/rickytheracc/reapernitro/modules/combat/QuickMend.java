@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.combat;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.misc.ModuleHelper;
 import me.rickytheracc.reapernitro.util.network.PacketManager;
@@ -14,13 +14,11 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Items;
 
 public class QuickMend extends ReaperModule {
-
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgPause = settings.createGroup("Pause");
 
     public final Setting<Double> enableAt = sgGeneral.add(new DoubleSetting.Builder().name("threshold").description("What durability to enable at.").defaultValue(20).min(1).sliderMin(1).sliderMax(100).max(100).build());
     private final Setting<Double> minHealth = sgGeneral.add(new DoubleSetting.Builder().name("min-health").description("Min health for repairing.").defaultValue(10).min(0).sliderMax(36).max(36).build());
-    private final Setting<Boolean> passive = sgGeneral.add(new BoolSetting.Builder().name("passive").description("Keep AutoXP on and repair automatically.").defaultValue(false).build());
     private final Setting<Boolean> moduleControl = sgGeneral.add(new BoolSetting.Builder().name("module-control").defaultValue(true).build());
     private final Setting<Boolean> onlyInHole = sgGeneral.add(new BoolSetting.Builder().name("require-hole").defaultValue(false).build());
     private final Setting<Boolean> silent = sgGeneral.add(new BoolSetting.Builder().name("silent").defaultValue(false).build());
@@ -34,7 +32,7 @@ public class QuickMend extends ReaperModule {
     private final Setting<Boolean> pauseOnMine = sgPause.add(new BoolSetting.Builder().name("pause-on-mine").description("Pauses while mining.").defaultValue(true).build());
 
     public QuickMend() {
-        super(ML.R, "quick-mend", "Automatically repair your armor.");
+        super(Reaper.R, "quick-mend", "Automatically repair your armor.");
     }
 
     @EventHandler

@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.combat;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import meteordevelopment.meteorclient.events.entity.player.PlayerMoveEvent;
 import meteordevelopment.meteorclient.events.meteor.KeyEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
@@ -48,7 +48,7 @@ public class ReaperLongJump extends Module {
     private final Setting<Double> stepHeight = sgAC.add(new DoubleSetting.Builder().name("step-height").defaultValue(1).min(0.5).sliderRange(0.5, 10).visible(step::get).build());
 
     public ReaperLongJump() {
-        super(ML.R, "reaper-long-jump", "Manipulate movement packets to travel quickly.");
+        super(Reaper.R, "reaper-long-jump", "Manipulate movement packets to travel quickly.");
     }
 
     private int chargeTicked;

@@ -1,6 +1,6 @@
-package me.rickytheracc.reapernitro.modules.render;
+package me.rickytheracc.reapernitro.modules.external;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.render.ExternalRenderers;
 import me.rickytheracc.reapernitro.util.services.NotificationManager;
@@ -12,7 +12,7 @@ import meteordevelopment.orbit.EventHandler;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class ExternalNotifications extends ReaperModule {
+public class ExternalNotifs extends ReaperModule {
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
@@ -24,8 +24,8 @@ public class ExternalNotifications extends ReaperModule {
     private ExternalRenderers.ExternalFrame externalFrame;
     private RainbowColor rc = new RainbowColor();
 
-    public ExternalNotifications() {
-        super(ML.W, "external-notifications", "render notifications outside the client");
+    public ExternalNotifs() {
+        super(Reaper.W, "external-notifications", "render notifications outside the client");
     }
 
     @Override

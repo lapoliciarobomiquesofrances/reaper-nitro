@@ -1,10 +1,8 @@
 package me.rickytheracc.reapernitro.modules.chat;
 
-import me.rickytheracc.reapernitro.modules.ML;
-import me.rickytheracc.reapernitro.util.misc.MessageUtil;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.game.GameJoinedEvent;
-import meteordevelopment.meteorclient.events.game.ReceiveMessageEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.IntSetting;
 import meteordevelopment.meteorclient.settings.Setting;
@@ -12,9 +10,6 @@ import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
-import meteordevelopment.orbit.EventPriority;
-
-import java.util.ArrayList;
 
 public class AutoLogin extends ReaperModule {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -34,7 +29,7 @@ public class AutoLogin extends ReaperModule {
     );
 
     public AutoLogin() {
-        super(ML.C, "auto-login", "Automatically log into servers that use /login.");
+        super(Reaper.C, "auto-login", "Automatically log into servers that use /login.");
     }
 
     private int messageDelay;

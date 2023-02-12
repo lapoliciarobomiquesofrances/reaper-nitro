@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.misc;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.player.Interactions;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
@@ -35,7 +35,7 @@ public class OneTap extends ReaperModule {
     private final Setting<Boolean> debug = sgGeneral.add(new BoolSetting.Builder().name("debug").defaultValue(false).build());
 
     public OneTap() {
-        super(ML.M, "one-tap", "one tap bow exploit.");
+        super(Reaper.M, "one-tap", "one tap bow exploit.");
     }
 
     private long lastShootTime;

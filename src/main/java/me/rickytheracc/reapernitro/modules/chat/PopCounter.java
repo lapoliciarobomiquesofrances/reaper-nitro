@@ -2,7 +2,7 @@ package me.rickytheracc.reapernitro.modules.chat;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.misc.Formatter;
 import me.rickytheracc.reapernitro.util.misc.MessageUtil;
@@ -15,8 +15,6 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.friends.Friends;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 
@@ -44,9 +42,6 @@ public class PopCounter extends ReaperModule {
     public final Setting<Boolean> doPlaceholders = sgGeneral.add(new BoolSetting.Builder().name("placeholders").description("Enable global placeholders for pop messages.").defaultValue(false).build());
     private final Setting<List<String>> popMessages = sgMessages.add(new StringListSetting.Builder().name("pop-messages").description("Messages to use when announcing pops.").defaultValue(Collections.emptyList()).build());
 
-    // KillFX
-    //private final Setting<Boolean> killFX = sgGeneral.add(new BoolSetting.Builder().name("kill-fx").description("render a death effect on people you kill").defaultValue(false).build());
-
     public final Object2IntMap<UUID> totemPops = new Object2IntOpenHashMap<>();
     public final Object2IntMap<UUID> deathPops = new Object2IntOpenHashMap<>();
     private final Object2IntMap<UUID> chatIds = new Object2IntOpenHashMap<>();
@@ -54,7 +49,7 @@ public class PopCounter extends ReaperModule {
 
 
     public PopCounter() {
-        super(ML.C, "pop-counter", "Count player's totem pops.");
+        super(Reaper.C, "pop-counter", "Count player's totem pops.");
     }
     private int announceWait;
 
@@ -142,7 +137,7 @@ public class PopCounter extends ReaperModule {
                 String name = pl.getEntityName();
                 if (doPlaceholders.get()) popMessage = Formatter.applyPlaceholders(popMessage);
                 //if (suffix.get()) popMessage = popMessage + Formatter.getSuffix();
-                MessageUtil.sendClientMessage(popMessage);
+//                MessageUtil.sendClientMessage(popMessage);
                 if (pmOthers.get()) MessageUtil.sendDM(name, popMessage);
                 announceWait = announceDelay.get() * 20;
             }
@@ -192,18 +187,4 @@ public class PopCounter extends ReaperModule {
         if (popMessage.contains("{player}")) popMessage = popMessage.replace("{player}", playerName);
         return popMessage;
     }
-
-
-    private void doFX(double x, double y, double z) {
-        LightningEntity lightningEntity = new LightningEntity(EntityType.LIGHTNING_BOLT, mc.world);
-        if (lightningEntity.getType() == null) return;
-        lightningEntity.updatePosition(x, y ,z);
-        lightningEntity.refreshPositionAfterTeleport(x, y, z);
-        mc.world.addEntity(lightningEntity.getId(), lightningEntity);
-    }
-
-    /*@Override
-    public String getInfoString() {
-        return Integer.toString(targets.size());
-    }*/
 }

@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.misc;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.world.BlockHelper;
 import me.rickytheracc.reapernitro.util.render.Renderers;
@@ -46,7 +46,7 @@ public class WideScaffold extends ReaperModule {
     private final ArrayList<Renderers.SimpleBlockRender> renders = new ArrayList<>();
 
     public WideScaffold() {
-        super(ML.M, "wide-scaffold", "Scaffold but wider.");
+        super(Reaper.M, "wide-scaffold", "Scaffold but wider.");
     }
 
     @Override

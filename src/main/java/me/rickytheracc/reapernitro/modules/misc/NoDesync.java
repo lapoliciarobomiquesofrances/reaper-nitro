@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.misc;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.entity.player.BreakBlockEvent;
 import meteordevelopment.meteorclient.events.entity.player.InteractBlockEvent;
@@ -20,7 +20,7 @@ public class NoDesync extends ReaperModule {
     private final Setting<Boolean> placeBlock = sgGeneral.add(new BoolSetting.Builder().name("place").description("Anti-desync for block placing.").defaultValue(true).build());
 
     public NoDesync() {
-        super(ML.M, "no-desync", "Prevent ghost block placements.");
+        super(Reaper.M, "no-desync", "Prevent ghost block placements.");
     }
 
 

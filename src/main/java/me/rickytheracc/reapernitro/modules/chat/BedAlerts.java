@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.chat;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.modules.combat.SelfTrapPlus;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.player.Interactions;
@@ -73,7 +73,7 @@ public class BedAlerts extends ReaperModule {
     );
 
     public BedAlerts() {
-        super(ML.C, "bed-alerts", "Alerts you about nearby players with beds in their inventory.");
+        super(Reaper.C, "bed-alerts", "Alerts you about nearby players with beds in their inventory.");
     }
 
     private final ArrayList<PlayerEntity> bedFags = new ArrayList<>();

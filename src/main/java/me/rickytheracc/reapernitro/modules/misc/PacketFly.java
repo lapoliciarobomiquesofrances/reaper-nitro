@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.misc;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.misc.SystemTimer;
 import me.rickytheracc.reapernitro.util.world.BlockHelper;
@@ -156,7 +156,7 @@ public class PacketFly extends ReaperModule {
     private static final Random random = new Random();
 
     public PacketFly() {
-        super(ML.M, "packet-fly", "easily");
+        super(Reaper.M, "packet-fly", "easily");
     }
 
     @Override

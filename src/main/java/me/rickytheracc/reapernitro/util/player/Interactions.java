@@ -343,34 +343,6 @@ public class Interactions {
         return p;
     }
 
-    public static String getCurrentIGN() {
-        return mc.getSession().getUsername();
-    }
-
-    public static String getIGNSafe() {
-        return MinecraftClient.getInstance().getSession().getUsername();
-    }
-
-    public static boolean isDeveloper() {
-        return ResourceLoaderService.DEVELOPERS.contains(getIGNSafe());
-    }
-
-    public static boolean isBetaUser() {
-        return false;
-    }
-
-    public static boolean isDev(String ign) {
-        return ResourceLoaderService.DEVELOPERS.contains(ign);
-    }
-
-    public static boolean isBeta(String ign) {
-        return ResourceLoaderService.BETA.contains(ign);
-    }
-
-    public static boolean isUser(String ign) {
-        return ResourceLoaderService.USER.contains(ign);
-    }
-
 
 
     public static String getCurrentPing() {
@@ -420,11 +392,4 @@ public class Interactions {
         }
         return false;
     }
-
-    public static int getKills() {return Stats.kills;}
-    public static int getDeaths() {return Stats.deaths;}
-    public static int getHighscore() {return Stats.highscore;}
-    public static int getKillstreak() {return Stats.killStreak;}
-    public static String getKD() {return Stats.getKD();}
-    public static String getPlaytime() {return Stats.getPlayTime();}
 }

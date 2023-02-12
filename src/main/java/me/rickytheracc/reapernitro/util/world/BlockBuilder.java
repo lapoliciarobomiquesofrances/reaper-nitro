@@ -10,7 +10,6 @@ import java.util.List;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class BlockBuilder {
-
     public enum SurroundDesign {
         Single,
         Double,

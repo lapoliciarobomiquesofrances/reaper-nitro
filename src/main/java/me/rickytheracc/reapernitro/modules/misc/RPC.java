@@ -1,7 +1,6 @@
 package me.rickytheracc.reapernitro.modules.misc;
 
 import me.rickytheracc.reapernitro.Reaper;
-import me.rickytheracc.reapernitro.modules.ML;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.misc.Formatter;
 import me.rickytheracc.reapernitro.util.misc.MathUtil;
@@ -44,7 +43,7 @@ public class RPC extends ReaperModule {
 
 
     public RPC() {
-        super(ML.M, "reaper-presence", "Discord RPC for Reaper");
+        super(Reaper.M, "reaper-presence", "Discord RPC for Reaper");
         runInMainMenu = true;
     }
 

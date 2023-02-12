@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.misc;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.MathUtil;
 import me.rickytheracc.reapernitro.util.misc.ModuleHelper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
@@ -25,7 +25,7 @@ public class StrictMove extends ReaperModule {
     private long lastPearl, lastChorus;
 
     public StrictMove() {
-        super(ML.M, "strict-move", "Mitigate lag-back from modules and/or strict anti-cheat");
+        super(Reaper.M, "strict-move", "Mitigate lag-back from modules and/or strict anti-cheat");
     }
 
     @Override

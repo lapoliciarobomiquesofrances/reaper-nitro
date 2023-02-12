@@ -1,7 +1,6 @@
-package me.rickytheracc.reapernitro.modules.render;
+package me.rickytheracc.reapernitro.modules.external;
 
 import me.rickytheracc.reapernitro.Reaper;
-import me.rickytheracc.reapernitro.modules.ML;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.misc.Formatter;
 import me.rickytheracc.reapernitro.util.misc.Sorter;
@@ -76,9 +75,8 @@ public class ExternalHUD extends ReaperModule {
     private RainbowColor rc = new RainbowColor();
 
     public ExternalHUD() {
-        super(ML.W, "external-hud", "render a simple hud outside the client");
+        super(Reaper.W, "external-hud", "render a simple hud outside the client");
     }
-
 
     @Override
     public void onActivate() {
@@ -100,7 +98,6 @@ public class ExternalHUD extends ReaperModule {
         ExternalRenderers.activeFrames--;
         if (externalFrame != null) externalFrame.setVisible(false);
     }
-
 
     @EventHandler
     private void onTick(TickEvent.Post event) {

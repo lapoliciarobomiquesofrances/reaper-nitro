@@ -1,7 +1,6 @@
 package me.rickytheracc.reapernitro.modules.chat;
 
-import me.rickytheracc.reapernitro.modules.ML;
-import me.rickytheracc.reapernitro.util.misc.MessageUtil;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.settings.*;
@@ -110,7 +109,7 @@ public class ChatTweaks extends ReaperModule {
     );
 
     public ChatTweaks() {
-        super(ML.C, "chat-tweaks", "Various tweaks to the chat and prefix controller.");
+        super(Reaper.C, "chat-tweaks", "Various tweaks to the chat and prefix controller.");
     }
 
     private String whisperSender;

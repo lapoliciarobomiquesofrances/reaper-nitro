@@ -1,15 +1,13 @@
 package me.rickytheracc.reapernitro.modules.combat;
 
-import me.rickytheracc.reapernitro.events.DeathEvent;
-import me.rickytheracc.reapernitro.modules.ML;
-import me.rickytheracc.reapernitro.util.misc.ReaperModule;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.MathUtil;
+import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.network.PacketManager;
 import me.rickytheracc.reapernitro.util.player.Interactions;
 import me.rickytheracc.reapernitro.util.render.Renderers;
 import me.rickytheracc.reapernitro.util.world.BlockHelper;
 import me.rickytheracc.reapernitro.util.world.CombatHelper;
-import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.render.Render2DEvent;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -49,9 +47,6 @@ public class AnchorGod extends ReaperModule {
         private BlockHitResult hitResult;
 
         public AnchorPlacement() {}
-        public AnchorPlacement(BlockPos anchorPos) {
-            this.set(anchorPos);
-        }
 
         public void set(BlockPos anchorPos) {
             Vec3d v = BlockHelper.vec3d(anchorPos);
@@ -141,10 +136,9 @@ public class AnchorGod extends ReaperModule {
     private AnchorPlacement placePos, breakPos;
     private Renderers.SimpleAnchorRender anchorRender, breakRender;
     private int placeTimer, breakTimer;
-    private long lastTrapMine, lastPlace, lastBreak;
 
     public AnchorGod() {
-        super(ML.R, "anchor-god", "overworld fags coping");
+        super(Reaper.R, "anchor-god", "overworld fags coping");
     }
 
     @Override
@@ -156,9 +150,6 @@ public class AnchorGod extends ReaperModule {
         breakRender = null;
         placeTimer = 0;
         breakTimer = breakDelay.get();
-        lastPlace = MathUtil.now();
-        lastBreak = MathUtil.now() + breakDelay.get();
-        lastTrapMine = MathUtil.now() - 5000;
     }
 
     @EventHandler
@@ -201,10 +192,6 @@ public class AnchorGod extends ReaperModule {
             if (breakRender.shouldRemove()) breakRender = null;
         }
 
-        if (target != null) {
-            if (target.deathTime > 0 || target.getHealth() <= 0) MeteorClient.EVENT_BUS.post(DeathEvent.KillEvent.get(target, target.getPos()));
-            target = null;
-        }
         target = TargetUtils.getPlayerTarget(targetRange.get(), SortPriority.LowestDistance); // targeting
         if (TargetUtils.isBadTarget(target, targetRange.get())) return;
 

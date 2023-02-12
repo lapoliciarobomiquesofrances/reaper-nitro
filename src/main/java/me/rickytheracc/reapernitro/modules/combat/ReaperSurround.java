@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.combat;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.network.PacketManager;
 import me.rickytheracc.reapernitro.util.player.Interactions;
@@ -79,7 +79,7 @@ public class ReaperSurround extends ReaperModule {
     private int crystalDelay, bpt;
 
     public ReaperSurround() {
-        super(ML.R, "reaper-surround", "surround");
+        super(Reaper.R, "reaper-surround", "surround");
     }
 
     @Override

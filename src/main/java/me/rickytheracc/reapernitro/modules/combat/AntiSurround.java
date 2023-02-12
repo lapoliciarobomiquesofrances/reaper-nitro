@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.combat;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.combat.CityUtils;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.misc.Task;
@@ -56,7 +56,7 @@ public class AntiSurround extends ReaperModule {
     private final Setting<Double> scale = sgRender.add(new DoubleSetting.Builder().name("scale").description("Scale of the breaking progress.").defaultValue(1.5).sliderRange(0.01, 3).visible(renderProgress::get).build());
 
     public AntiSurround() {
-        super(ML.R, "anti-surround", "Automatically breaks target's surround.");
+        super(Reaper.R, "anti-surround", "Automatically breaks target's surround.");
     }
 
     private FindItemResult pickaxe, gap, crystal, obsidian;

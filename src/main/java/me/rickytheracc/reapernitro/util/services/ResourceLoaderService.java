@@ -1,7 +1,6 @@
 package me.rickytheracc.reapernitro.util.services;
 
 import me.rickytheracc.reapernitro.Reaper;
-import me.rickytheracc.reapernitro.util.os.FileHelper;
 import meteordevelopment.meteorclient.utils.network.Http;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -16,30 +15,14 @@ import java.util.ArrayList;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class ResourceLoaderService {
-
-    // user lists
-    //public static String DEV_DB_URL = "";
-    public static String BETA_DB_URL = "https://pastebin.com/raw/2CyKb1Un";
-    public static String USER_DB_URL = "https://pastebin.com/raw/rAevfDYC";
-
     public static ArrayList<String> DEVELOPERS = new ArrayList<>();
     public static ArrayList<String> BETA = new ArrayList<>();
     public static ArrayList<String> USER = new ArrayList<>();
-
-    public static void initDB(ArrayList<String> db, String url) {
-        TL.cached.execute(() -> {
-            ArrayList<String> data = FileHelper.downloadList(url);
-            if (data == null || data.isEmpty()) return;
-            db.clear();
-            db.addAll(data);
-        });
-    }
-
     public static ArrayList<Resource> serverResources = new ArrayList<>();
 
     public static void init() {
         for (Resource r : serverResources) if (!r.isCached()) r.cache(); // Download anything that isn't cached yet
-        TL.cached.execute(() -> {
+        Reaper.cached.execute(() -> {
             while (mc.world == null) {
                 try {Thread.sleep(500);} catch (Exception ignored) {} // Wait for the world to load
             }
@@ -51,7 +34,7 @@ public class ResourceLoaderService {
 
     public static void bindAssetFromURL(Identifier asset, String url) {
         if (mc.world == null || asset == null || url == null) return;
-        TL.cached.execute(() -> {
+        Reaper.cached.execute(() -> {
             try {
                 var data = NativeImage.read(Http.get(url).sendInputStream());
                 mc.getTextureManager().registerTexture(asset, new NativeImageBackedTexture(data));
@@ -64,7 +47,7 @@ public class ResourceLoaderService {
     public static void bindAssetFromFile(Identifier asset, String fileName) {
         if (mc.world == null || asset == null || fileName == null) return;
         if (!Reaper.USER_ASSETS.exists()) return;
-        TL.cached.execute(() -> {
+        Reaper.cached.execute(() -> {
             File[] userAssets = Reaper.USER_ASSETS.listFiles();
             if (userAssets == null || userAssets.length < 1) return;
             for (File f : userAssets) {
@@ -75,9 +58,7 @@ public class ResourceLoaderService {
                         var rsc = NativeImage.read(is);
                         mc.getTextureManager().registerTexture(asset, new NativeImageBackedTexture(rsc));
                         is.close();
-                    } catch (Exception ignored) {
-                        //e.printStackTrace();
-                    }
+                    } catch (Exception ignored) {}
                 }
             }
         });
@@ -110,7 +91,7 @@ public class ResourceLoaderService {
         public boolean isCached() {return this.getAsFile().exists();}
 
         public void cache() {
-            TL.cached.execute(() -> {
+            Reaper.cached.execute(() -> {
                 try {
                     File outFile = this.getAsFile();
                     if (!outFile.exists()) outFile.createNewFile();
@@ -127,7 +108,7 @@ public class ResourceLoaderService {
         }
 
         public void load() {
-            TL.cached.execute(() -> {
+            Reaper.cached.execute(() -> {
                 File asset = this.getAsFile();
                 if (asset == null || !asset.exists()) return;
                 try {

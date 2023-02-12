@@ -1,7 +1,6 @@
 package me.rickytheracc.reapernitro.modules.combat;
 
-import me.rickytheracc.reapernitro.events.DeathEvent;
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.misc.Formatter;
 import me.rickytheracc.reapernitro.util.misc.MathUtil;
@@ -11,7 +10,6 @@ import me.rickytheracc.reapernitro.util.world.BlockHelper;
 import me.rickytheracc.reapernitro.util.world.CombatHelper;
 import me.rickytheracc.reapernitro.util.world.DamageCalculator;
 import me.rickytheracc.reapernitro.util.render.Renderers;
-import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.render.Render2DEvent;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -140,7 +138,7 @@ public class BedGod extends ReaperModule {
     private long bedTimer;
 
     public BedGod() {
-        super(ML.R, "bed-god", "the best bed aura");
+        super(Reaper.R, "bed-god", "the best bed aura");
     }
 
     @Override
@@ -199,10 +197,10 @@ public class BedGod extends ReaperModule {
         }
         alertedCraft = false;
 
-        if (target != null) {
-            if (target.deathTime > 0 || target.getHealth() <= 0) MeteorClient.EVENT_BUS.post(DeathEvent.KillEvent.get(target, target.getPos()));
-            target = null;
-        }
+//        if (target != null) {
+//            if (target.deathTime > 0 || target.getHealth() <= 0) MeteorClient.EVENT_BUS.post(DeathEvent.KillEvent.get(target, target.getPos()));
+//            target = null;
+//        }
         target = TargetUtils.getPlayerTarget(targetRange.get(), SortPriority.LowestDistance); // targeting
         if (TargetUtils.isBadTarget(target, targetRange.get())) {
             target = TargetUtils.getPlayerTarget(targetRange.get(), SortPriority.LowestDistance);

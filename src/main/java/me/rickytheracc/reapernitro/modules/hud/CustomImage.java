@@ -18,7 +18,6 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.Identifier;
 
 public class CustomImage extends HudElement {
-
     public static final HudElementInfo<CustomImage> INFO = new HudElementInfo<>(Reaper.HUD_GROUP, "custom-image", "Displays a custom image", CustomImage::new);
 
     public enum LogoMode {File, URL}

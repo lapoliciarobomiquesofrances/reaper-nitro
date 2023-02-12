@@ -1,7 +1,7 @@
 package me.rickytheracc.reapernitro.modules.misc;
 
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
@@ -27,7 +27,7 @@ public class ChorusPredict extends ReaperModule {
     private Vec3d vec;
 
     public ChorusPredict() {
-        super(ML.M, "chorus-predict", "Modifies usage of chorus fruit.");
+        super(Reaper.M, "chorus-predict", "Modifies usage of chorus fruit.");
     }
 
     @Override

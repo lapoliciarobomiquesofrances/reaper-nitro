@@ -1,7 +1,7 @@
 package me.rickytheracc.reapernitro.util.misc;
 
 
-import me.rickytheracc.reapernitro.util.services.TL;
+import me.rickytheracc.reapernitro.Reaper;
 import meteordevelopment.meteorclient.utils.PostInit;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.Utils;
@@ -9,7 +9,6 @@ import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -18,6 +17,9 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class MessageUtil {
     private static ScheduledExecutorService messageThread;
+    public static ArrayList<String> pendingEZ = new ArrayList<>();
+    public static ArrayList<Message> queue = new ArrayList<>();
+    public static ArrayList<Message> removalQueue = new ArrayList<>();
 
     @PostInit
     public static void init() {
@@ -25,10 +27,12 @@ public class MessageUtil {
         messageThread.scheduleAtFixedRate(MessageUtil::update, 2500, 500, TimeUnit.MILLISECONDS);
     }
 
+    public static void shutdown() {
+        messageThread.shutdownNow();
+    }
 
-    public static ArrayList<String> pendingEZ = new ArrayList<>();
-    public static ArrayList<Message> queue = new ArrayList<>();
-    public static ArrayList<Message> removalQueue = new ArrayList<>();
+    // Queueing Messages
+
 
     public static boolean isServerMessage(GameMessageS2CPacket packet) {
         return true;
@@ -38,17 +42,12 @@ public class MessageUtil {
     public static void sendDM(String name, String msg) {
         if (name == null || msg == null || mc.player == null) return;
         msg = Formatter.stripName(name, msg);
-        sendClientMessage("/msg " + name + " " + msg);
+        ChatUtils.sendPlayerMsg("/msg " + name + " " + msg);
     }
 
     public static void sendDM(String player, String msg, boolean stripName) {
         if (stripName) msg = Formatter.stripName(player, msg);
         sendMessage("/msg " + player + " " + msg);
-    }
-
-    public static void sendClientMessage(String msg) {
-        if (msg == null) return;
-        ChatUtils.sendPlayerMsg(msg);
     }
 
     public static void sendMessage(String msg) {
@@ -58,24 +57,24 @@ public class MessageUtil {
     }
 
     public static void sendEzMessage(String target, String ezMessage, long delay, boolean sendDM) {
-        TL.cached.execute(() -> {
+        Reaper.cached.execute(() -> {
             pendingEZ.add(target); // "lock" the name so no duplicates can be sent
             try {Thread.sleep(delay);} catch (Exception ignored) {}
-            sendClientMessage(ezMessage);
+            ChatUtils.sendPlayerMsg(ezMessage);
             if (sendDM) sendDM(target, ezMessage, true);
             pendingEZ.remove(target); // "unlock" it after the message is sent
         });
     }
 
     public static void sendDelayedMessage(String msg, long delay) {
-        TL.cached.execute(() -> {
+        Reaper.cached.execute(() -> {
             try {Thread.sleep(delay);} catch (Exception ignored) {}
-            sendClientMessage(msg);
+            ChatUtils.sendPlayerMsg(msg);
         });
     }
 
     public static void sendDelayedDM(String target, String msg, long delay, boolean stripName) {
-        TL.cached.execute(() -> {
+        Reaper.cached.execute(() -> {
             try {Thread.sleep(delay);} catch (Exception ignored) {}
             sendDM(target, msg, stripName);
         });
@@ -108,7 +107,7 @@ public class MessageUtil {
 
     public static void send(Message message) {
         switch (message.messageType) {
-            case Client -> sendClientMessage(message.message);
+            case Client -> ChatUtils.sendPlayerMsg(message.message);
             case Packet -> sendMessage(message.message);
         }
         if (message.sendDM) sendToPlayer(message.playerName, message.message, message.messageType);
@@ -117,7 +116,7 @@ public class MessageUtil {
     public static void sendToPlayer(String playerName, String m, MessageType type) {
         if (playerName == null || m == null || mc.player == null) return;
         switch (type) {
-            case Client -> sendClientMessage("/msg " + playerName + " " + m);
+            case Client -> ChatUtils.sendPlayerMsg("/msg " + playerName + " " + m);
             case Packet -> sendMessage("/msg " + playerName + " " +  m);
         }
     }

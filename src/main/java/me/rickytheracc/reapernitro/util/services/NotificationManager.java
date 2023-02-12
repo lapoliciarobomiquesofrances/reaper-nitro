@@ -1,5 +1,6 @@
 package me.rickytheracc.reapernitro.util.services;
 
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.modules.chat.NotifSettings;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 
@@ -12,7 +13,7 @@ public class NotificationManager {
     public static ArrayList<Notification> threadSafeNotifs = new ArrayList<>();
 
     public static void init() {
-        TL.schedueled.scheduleAtFixedRate(NotificationManager::update, 0, 1, TimeUnit.SECONDS);
+        Reaper.scheduled.scheduleAtFixedRate(NotificationManager::update, 0, 1, TimeUnit.SECONDS);
 
     }
 

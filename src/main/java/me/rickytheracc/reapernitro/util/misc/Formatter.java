@@ -9,17 +9,12 @@ import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import net.minecraft.SharedConstants;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class Formatter {
-
-    public static String getFormattedPath(File f) {
-        return "\"" + f.getPath() + "\"";
-    }
 
     public static String stripName(String playerName, String msg) {
         return msg.replace(playerName, "");
@@ -77,9 +72,6 @@ public class Formatter {
             if (m.contains("{songtitle}")) m = m.replace("{songtitle}", "Idle");
             if (m.contains("{songname}")) m = m.replace("{songname}", "Selecting a song");
         }
-
-        // misc
-        if (m.contains("{discord}")) m = m.replace("{invite}", Reaper.INVITE_LINK);
 
         return m;
     }

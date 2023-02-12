@@ -1,6 +1,6 @@
 package me.rickytheracc.reapernitro.modules.chat;
 
-import me.rickytheracc.reapernitro.modules.ML;
+import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.DoubleSetting;
@@ -28,7 +28,7 @@ public class ArmorAlert extends ReaperModule {
     );
 
     public ArmorAlert() {
-        super(ML.C, "armor-alert", "Alerts you when your armor pieces are low.");
+        super(Reaper.C, "armor-alert", "Alerts you when your armor pieces are low.");
     }
 
     List<Integer> alertedSlots = new ArrayList<>();

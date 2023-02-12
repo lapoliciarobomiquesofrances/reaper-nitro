@@ -1,6 +1,7 @@
 package me.rickytheracc.reapernitro.util.services;
 
-import me.rickytheracc.reapernitro.util.os.OSUtil;
+import com.sun.jna.Platform;
+import me.rickytheracc.reapernitro.Reaper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,13 +14,15 @@ import java.util.stream.Stream;
 public class SpotifyService {
 
     public static boolean isSpotifyRunning;
+    private static boolean isWindows;
     public static String currentTrack;
     public static String lastTrack;
     public static String currentArtist;
 
     public static void init() {
-        TL.schedueled.scheduleAtFixedRate(SpotifyService::updateCurrentTrack, 10000, 100, TimeUnit.MILLISECONDS); // wait a bit before starting to not interfere with client startup
-
+        // Wait for a bit before scheduling to not interfere with client startup
+        Reaper.scheduled.scheduleAtFixedRate(SpotifyService::updateCurrentTrack, 10000, 100, TimeUnit.MILLISECONDS);
+        isWindows = Platform.isWindows();
     }
 
     public static void reset() {
@@ -78,7 +81,7 @@ public class SpotifyService {
     }
 
     public static String[] getCurrentTrack() {
-        if (!OSUtil.isWindows) return null;
+        if (!isWindows) return null;
         ArrayList<String> results = new ArrayList<>();
         try {
             ProcessBuilder builder = new ProcessBuilder("cmd", "/c", "for /f \"tokens=* skip=9 delims= \" %g in ('tasklist /v /fo list /fi \"imagename eq spotify*\"') do @echo %g"); // lists all process titles
