@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "reaper-nitro",
+  "id": "reaper-plus",
   "version": "${version}",
-  "name": "Reaper Nitro",
+  "name": "Reaper Plus",
   "description": "The best meteor addon but improved by Ricky.",
   "authors": [
     "NotGhostTypes",
@@ -14,11 +14,11 @@
   "environment": "client",
   "entrypoints": {
     "meteor": [
-      "me.rickytheracc.reapernitro.Reaper"
+      "me.rickytheracc.reaperplus.ReaperPlus"
     ]
   },
   "mixins": [
-    "reaper.mixins.json"
+    "reaperplus.mixins.json"
   ],
   "custom": {
     "meteor-client:color": "225,25,25"
