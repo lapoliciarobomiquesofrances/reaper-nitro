@@ -260,7 +260,7 @@ public class SmartHoleFill extends ReaperModule {
     );
 
     public SmartHoleFill() {
-        super(ReaperPlus.R, "smart-holefill", "Hole fill but smart");
+        super(ReaperPlus.R, "smart-holefill", "The best way to make your enemies really, REALLY mad.");
     }
 
     List<PlayerEntity> targets = new ArrayList<>();
