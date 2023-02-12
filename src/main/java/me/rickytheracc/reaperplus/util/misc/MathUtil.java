@@ -8,59 +8,83 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Random;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class MathUtil {
+    public static final Random RANDOM = new Random();
 
-    public static int intToTicks(int i) {
+    public static int random(int min, int max) {
+        return RANDOM.nextInt(min, max);
+    }
+
+    public static double random(double min, double max) {
+        return RANDOM.nextDouble(min, max);
+    }
+
+    public static int secondsToTicks(int i) {
         return i * 20;
     }
-    public static int ticksToInt(int i) {
+    public static int ticksToSeconds(int i) {
         return i / 20;
     }
-
-
-    public static double roundDouble(double d) {return Math.ceil(d);}
 
     public static long msPassed(Long start) {
         return System.currentTimeMillis() - start;
     }
-    public static long secondsPassed(Long start) { return msToSeconds(msToSeconds(start));}
-    public static long now() {return System.currentTimeMillis();}
+    public static long secondsPassed(Long start) {
+        return msToSeconds(msToSeconds(start));
+    }
 
-    public static String timeElapsed(Long start) {return DurationFormatUtils.formatDuration(System.currentTimeMillis() - start, "HH:mm:ss");}
-    public static String hoursElapsed(Long start) {return DurationFormatUtils.formatDuration(System.currentTimeMillis() - start, "HH");}
-    public static String minutesElapsed(Long start) {return DurationFormatUtils.formatDuration(System.currentTimeMillis() - start, "mm");}
-    public static String secondsElapsed(Long start) {return DurationFormatUtils.formatDuration(System.currentTimeMillis() - start, "ss");}
-    public static String millisElapsed(Long start) {return Math.round(MathUtil.msPassed(start) * 100.0) / 100.0 + "ms";}
+    public static String timeElapsed(Long start) {
+        return DurationFormatUtils.formatDuration(System.currentTimeMillis() - start, "HH:mm:ss");
+    }
+    public static String hoursElapsed(Long start) {
+        return DurationFormatUtils.formatDuration(System.currentTimeMillis() - start, "HH");
+    }
+    public static String minutesElapsed(Long start) {
+        return DurationFormatUtils.formatDuration(System.currentTimeMillis() - start, "mm");
+    }
+    public static String secondsElapsed(Long start) {
+        return DurationFormatUtils.formatDuration(System.currentTimeMillis() - start, "ss");
+    }
+    public static String millisElapsed(Long start) {
+        return Math.round(MathUtil.msPassed(start) * 100.0) / 100.0 + "ms";
+    }
 
-    public static long secondsToMS(int seconds) {return TimeUnit.SECONDS.toMillis(seconds);}
+    public static long secondsToMS(int seconds) {
+        return seconds * 1000L;
+    }
 
-    public static long msToSeconds(long ms) {return TimeUnit.MILLISECONDS.toSeconds(ms);}
-    public static int msToTicks(long ms) {return intToTicks((int) msToSeconds(ms));}
-
-    public static Vec3d getVelocity(PlayerEntity player) {
-        return player.getVelocity();
+    public static long msToSeconds(long ms) {
+        return ms / 1000L;
+    }
+    public static int msToTicks(long ms) {
+        return secondsToTicks((int) msToSeconds(ms));
     }
 
     public static BlockPos offsetByVelocity(BlockPos pos, PlayerEntity player) {
         if (pos == null || player == null) return null;
-        Vec3d velocity = getVelocity(player);
+        Vec3d velocity = player.getVelocity();
         return pos.add(velocity.x, velocity.y, velocity.z);
     }
 
     public static BlockPos generatePredict(BlockPos pos, PlayerEntity player, int ticks) {
         if (pos == null || player == null) return null;
-        Vec3d velocity = getVelocity(player);
-        Vec3i v = new Vec3i(velocity.x * ticks, velocity.y * ticks, velocity.z * ticks);
-        return pos.add(v);
+        Vec3d velocity = player.getVelocity();
+        return pos.add(velocity.x * ticks, velocity.y * ticks, velocity.z * ticks);
     }
 
-    public static boolean intersects(Box box) { return EntityUtils.intersectsWithEntity(box, entity -> !entity.isSpectator());}
-    public static boolean intersects(BlockPos pos) { return intersects(new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ())); }
-    public static boolean intersectsAbove(BlockPos pos) { return intersects(new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY() + 1, pos.getZ())); }
+    public static boolean intersects(Box box) {
+        return EntityUtils.intersectsWithEntity(box, entity -> !entity.isSpectator());
+    }
+    public static boolean intersects(BlockPos pos) {
+        return intersects(new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ()));
+    }
+    public static boolean intersectsAbove(BlockPos pos) {
+        return intersects(new Box(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY() + 1, pos.getZ()));
+    }
 
     public static double[] directionSpeed(float speed) {
         float forward = mc.player.input.movementForward;
@@ -88,7 +112,4 @@ public class MathUtil {
 
         return new double[] {posX, posZ};
     }
-
-
-
 }

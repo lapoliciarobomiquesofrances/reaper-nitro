@@ -26,7 +26,7 @@ public class Renderers {
             lineColor1 = new Color(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
             damageColor = new Color(damageC.r, damageC.g, damageC.b, damageC.a);
             fadeFactor = fade;
-            renderTicks = MathUtil.intToTicks(renderTime);
+            renderTicks = MathUtil.secondsToTicks(renderTime);
             damage = dmg;
             damageText = String.valueOf(Math.round(damage * 100.0) / 100.0);
         }
@@ -73,7 +73,7 @@ public class Renderers {
             lineColor1 = new Color(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
             damageColor = new Color(damageC.r, damageC.g, damageC.b, damageC.a);
             fadeFactor = fade;
-            renderTicks = MathUtil.intToTicks(renderTime);
+            renderTicks = MathUtil.secondsToTicks(renderTime);
             damage = dmg;
             damageText = String.valueOf(Math.round(damage * 100.0) / 100.0);
         }
@@ -117,7 +117,7 @@ public class Renderers {
             sideColor1 = new Color(sideColor.r, sideColor.g, sideColor.b, sideColor.a);
             lineColor1 = new Color(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
             fadeFactor = fade;
-            renderTicks = MathUtil.intToTicks(renderTime);
+            renderTicks = MathUtil.secondsToTicks(renderTime);
         }
 
         public void tick() {
@@ -160,7 +160,7 @@ public class Renderers {
             sideColor1 = new Color(sideColor.r, sideColor.g, sideColor.b, -sideColor.a); // reverse alpha for fading in
             lineColor1 = new Color(lineColor.r, lineColor.g, lineColor.b, -lineColor.a);
             fadeFactor = fade;
-            renderTicks = MathUtil.intToTicks(renderTime);
+            renderTicks = MathUtil.secondsToTicks(renderTime);
         }
 
         public void tick() {

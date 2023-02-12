@@ -71,5 +71,4 @@ public class RenderHelper {
             event.renderer.quadHorizontal(pos.getX(), pos.getY() + 1, pos.getZ(), pos.getX() + 1, pos.getZ() + 1, sideColor);
         }
     }
-
 }

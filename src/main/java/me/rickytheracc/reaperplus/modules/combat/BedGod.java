@@ -152,7 +152,7 @@ public class BedGod extends Module {
         trapMine = null;
         burrowMine = null;
         bedsPlaced = 0;
-        bedTimer = MathUtil.now();
+        bedTimer = System.currentTimeMillis();
     }
 
 
@@ -178,7 +178,7 @@ public class BedGod extends Module {
         }
         if (bedPerSec.get() && MathUtil.msPassed(bedTimer) >= 1000) {
             bedsPlaced = 0;
-            bedTimer = MathUtil.now();
+            bedTimer = System.currentTimeMillis();
         }
     }
 
@@ -245,13 +245,13 @@ public class BedGod extends Module {
     private int getZeroTick() {
         int t;
         if (!CombatHelper.isInHole(target)) {
-            if (Interactions.findBedInAll().count() >= zeroTickMinBed.get()) t = Formatter.randInt(0, 3);
+            if (Interactions.findBedInAll().count() >= zeroTickMinBed.get()) t = MathUtil.random(0, 3);
             else t = 5;
         } else {
             if (Interactions.findBedInAll().count() < zeroTickMinBed.get()) {
-                t = Formatter.randInt(2, 4);
+                t = MathUtil.random(2, 4);
             } else {
-                t = Formatter.randInt(0, 3);
+                t = MathUtil.random(0, 3);
                 if (CombatHelper.isSelfTrapped(target)) t = 0; // 0 tick delay for self trap
             }
         }
@@ -261,7 +261,7 @@ public class BedGod extends Module {
 
     private void doBomb() {
         if (mc.player.currentScreenHandler instanceof CraftingScreenHandler && autoCraftPause.get()) return;
-        long start = MathUtil.now();
+        long start = System.currentTimeMillis();
         if (!placeCheck(placePos)) { // check if we have a current place pos
             if (debug.get()) info("invalid place pos, recalculating.");
             setPlacePos(); // recalculate if not

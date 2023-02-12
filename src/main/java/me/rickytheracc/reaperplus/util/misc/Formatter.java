@@ -9,6 +9,7 @@ import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import net.minecraft.SharedConstants;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -19,25 +20,14 @@ public class Formatter {
     public static String stripName(String playerName, String msg) {
         return msg.replace(playerName, "");
     }
-    public static int randInt(int min, int max) {
-        return min + (int) (Math.random() * ((max - min) + 1));
-    }
 
-    public static Color sToMC(SettingColor sc) { // SettingColor -> MeteorColor
-        if (sc == null) return null;
-        return new Color(sc.r, sc.g, sc.b, sc.a);
-    }
-
-    public static Color cToMC(java.awt.Color c) { // java.awt.Color -> MeteorColor
-        if (c == null) return null;
-        return new Color(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
-    }
-
+    @Nullable
     public static java.awt.Color mcToC(Color c) { // MeteorColor -> java.awt.color
         if (c == null) return null;
         return new java.awt.Color(c.r, c.g, c.b, c.a);
     }
 
+    @Nullable
     public static java.awt.Color sToC(SettingColor sc) { // SettingColor -> java.awt.color
         if (sc == null) return null;
         return new java.awt.Color(sc.r, sc.g, sc.b, sc.a);
@@ -60,7 +50,7 @@ public class Formatter {
         if (m.contains("{server}")) m = m.replace("{server}", Utils.getWorldName());
         if (m.contains("{version}")) m = m.replace("{version}", SharedConstants.getGameVersion().getName());
         if (m.contains("{rversion}")) m = m.replace("{rversion}", ReaperPlus.VERSION);
-        if (m.contains("{random}")) m = m.replace("{random}", String.valueOf(randInt(1, 9)));
+        if (m.contains("{random}")) m = m.replace("{random}", String.valueOf(MathUtil.random(1, 9)));
         if (m.contains("{username}")) m = m.replace("{username}", mc.getSession().getUsername());
         if (m.contains("{hp}")) m = m.replace("{hp}", String.valueOf(Math.rint(PlayerUtils.getTotalHealth())));
 
@@ -136,10 +126,4 @@ public class Formatter {
     // for Killfeed HUD module lol
     public static boolean hasKillFeed() { return Statistics.killfeed.isEmpty();}
     public static ArrayList<String> getKillFeed() { return Statistics.killfeed;}
-
-    //public static Random random = new Random();
-    public static int random(int min, int max) { return min + (int) (Math.random() * ((max - min) + 1)); }
-    public static double random(double min, double max) {
-        return Math.random() * (max - min) + min;
-    }
 }

@@ -30,8 +30,8 @@ public class StrictMove extends Module {
 
     @Override
     public void onActivate() {
-        lastPearl = MathUtil.now() - 5000;
-        lastChorus = MathUtil.now() - 5000;
+        lastPearl = System.currentTimeMillis() - 5000;
+        lastChorus = System.currentTimeMillis() - 5000;
         PacketFly pfly = Modules.get().get(PacketFly.class);
         if (pfly.isActive()) {
             error("Cannot use StrictMove and PacketFly at the same time!");
@@ -53,9 +53,9 @@ public class StrictMove extends Module {
     private void onPacketSend(PacketEvent.Send event) {
         if (event.packet instanceof PlayerInteractItemC2SPacket packet) {
             if (mc.player.getStackInHand(packet.getHand()).getItem().equals(Items.ENDER_PEARL)) {
-                lastPearl = MathUtil.now();
+                lastPearl = System.currentTimeMillis();
             } else if (mc.player.getStackInHand(packet.getHand()).getItem().equals(Items.CHORUS_FRUIT))  {
-                lastChorus = MathUtil.now();
+                lastChorus = System.currentTimeMillis();
             }
         }
     }

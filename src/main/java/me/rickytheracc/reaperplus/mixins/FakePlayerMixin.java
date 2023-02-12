@@ -103,8 +103,8 @@ public class FakePlayerMixin extends Module {
             if (!posList.isEmpty()) {
                 AnglePos angles = posList.remove(0);
                 FakePlayerManager.forEach(entity -> {
-                    entity.updateTrackedPositionAndAngles(angles.getPos().x, angles.getPos().y, angles.getPos().z, angles.getYaw(), angles.getPitch(), 3, false);
-                    entity.updateTrackedHeadRotation(angles.getYaw(), 3);
+                    entity.updateTrackedPositionAndAngles(angles.pos().x, angles.pos().y, angles.pos().z, angles.yaw(), angles.pitch(), 3, false);
+                    entity.updateTrackedHeadRotation(angles.yaw(), 3);
                 });
             } else {
                 if (!posList2.isEmpty() && loop.get()) posList.addAll(posList2); // loop at the end
@@ -117,6 +117,7 @@ public class FakePlayerMixin extends Module {
      * @author GhostTypes
      */
 
+    @Unique
     private void importRecording() {
         if (!ReaperPlus.RECORDINGS.exists()) {
             ReaperPlus.RECORDINGS.mkdirs();
@@ -159,6 +160,7 @@ public class FakePlayerMixin extends Module {
         }
     }
 
+    @Unique
     private void exportRecording(List<AnglePos> recording) {
         if (!ReaperPlus.RECORDINGS.exists()) ReaperPlus.RECORDINGS.mkdirs();
 
@@ -177,9 +179,9 @@ public class FakePlayerMixin extends Module {
             BufferedWriter writer = new BufferedWriter(new FileWriter(output.getPath()));
 
             for (AnglePos ap : recording) { /* store the angle pos list to a file */
-                float yaw = ap.getYaw();
-                float pitch = ap.getPitch();
-                Vec3d pos = ap.getPos();
+                float yaw = ap.yaw();
+                float pitch = ap.pitch();
+                Vec3d pos = ap.pos();
                 String l = yaw + "," + pitch + "," + pos.x + "," + pos.y + "," + pos.z;
                 writer.write(l + "\n");
             }
