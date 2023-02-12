@@ -117,6 +117,7 @@ public class FakePlayerMixin extends Module {
      * @author GhostTypes
      */
 
+    @Unique
     private void importRecording() {
         if (!ReaperPlus.RECORDINGS.exists()) {
             ReaperPlus.RECORDINGS.mkdirs();
@@ -159,6 +160,7 @@ public class FakePlayerMixin extends Module {
         }
     }
 
+    @Unique
     private void exportRecording(List<AnglePos> recording) {
         if (!ReaperPlus.RECORDINGS.exists()) ReaperPlus.RECORDINGS.mkdirs();
 
