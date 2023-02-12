@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.events.PopEvent;
 import me.rickytheracc.reaperplus.util.combat.Statistics;
-import me.rickytheracc.reaperplus.util.misc.MessageUtil;
+import me.rickytheracc.reaperplus.util.player.StringUtil;
 import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.entity.EntityRemovedEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -147,8 +147,8 @@ public class PopCounter extends ReaperModule {
             message = message.replace("{player}", event.name);
             message = message.replace("{pops}", String.valueOf(event.pops));
 
-            if (!privateMessage.get()) MessageUtil.sendNormalMessage(message, packet.get());
-            else MessageUtil.sendPrivateMessage(message, event.name, packet.get());
+            if (!privateMessage.get()) StringUtil.sendNormalMessage(message, packet.get());
+            else StringUtil.sendPrivateMessage(message, event.name, packet.get());
             announceWait = messageDelay.get();
         }
 

@@ -2,11 +2,13 @@ package me.rickytheracc.reaperplus.util.combat;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.events.DeathEvent;
 import me.rickytheracc.reaperplus.events.PlayerJoinEvent;
 import me.rickytheracc.reaperplus.events.PlayerLeaveEvent;
 import me.rickytheracc.reaperplus.events.PopEvent;
 import me.rickytheracc.reaperplus.modules.combat.*;
+import me.rickytheracc.reaperplus.util.player.PlayerUtil;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.game.GameJoinedEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
@@ -19,17 +21,25 @@ import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.starscript.value.Value;
+import net.minecraft.block.Block;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
@@ -37,6 +47,8 @@ public class Statistics {
     private static final Collection<PlayerListEntry> prevPlayerList = new ArrayList<>();
     public static final Object2IntMap<UUID> totemPops = new Object2IntOpenHashMap<>();
     public static final Object2IntMap<UUID> playerDeaths = new Object2IntOpenHashMap<>();
+    public static final HashMap<BlockPos, Long> pendingBlocks = new HashMap<>();
+    private static ScheduledExecutorService thread;
 
     public static List<Module> combatModules = new ArrayList<>(Arrays.asList(
         Modules.get().get(AnchorGod.class),
@@ -65,9 +77,12 @@ public class Statistics {
     @PostInit
     public static void init() {
         MeteorClient.EVENT_BUS.subscribe(Statistics.class);
+        ReaperPlus.scheduled.schedule(() -> {
+            if (pendingBlocks.isEmpty()) return;
+            removeExpiredPlacements();
+        }, 10, TimeUnit.MILLISECONDS);
         startTime = System.currentTimeMillis();
     }
-
     @EventHandler
     public static void onGameJoin(GameJoinedEvent event) {
         kills = 0;
@@ -79,6 +94,7 @@ public class Statistics {
         totemPops.clear();
         playerDeaths.clear();
         killfeed.clear();
+        pendingBlocks.clear();
 
         if (!mc.isInSingleplayer()) {
             prevPlayerList.clear();
@@ -107,7 +123,7 @@ public class Statistics {
     public static Value getStreak() {
         return Value.number(killStreak);
     }
-    public static Value getHighSore() {
+    public static Value getHighScore() {
         return Value.number(highscore);
     }
     public static Value getKDR() {
@@ -222,6 +238,24 @@ public class Statistics {
                 }
             }
         }
+
+        if (event.packet instanceof BlockUpdateS2CPacket packet) {
+            if (pendingBlocks.isEmpty()) return;
+
+            if (pendingBlocks.containsKey(packet.getPos())) {
+                synchronized (pendingBlocks) {pendingBlocks.remove(packet.getPos());}
+
+                Block block = mc.world.getBlockState(packet.getPos()).getBlock();
+                BlockSoundGroup group = block.getSoundGroup(block.getDefaultState());
+
+                mc.world.playSound(
+                    packet.getPos().getX(), packet.getPos().getY(),
+                    packet.getPos().getZ(), group.getPlaceSound(),
+                    SoundCategory.BLOCKS, (group.getVolume() + 1.0F) / 8.0F,
+                    group.getPitch() * 0.5F, true
+                );
+            }
+        }
     }
 
     public static boolean targetCheck(PlayerEntity player) {
@@ -236,5 +270,21 @@ public class Statistics {
         }
 
         return false;
+    }
+
+    public static void addPlacement(BlockPos pos) {
+        synchronized (pendingBlocks) {
+            pendingBlocks.putIfAbsent(pos, System.currentTimeMillis());
+        }
+    }
+
+    private static void removeExpiredPlacements() {
+        double latency = PlayerUtil.getEntry().getLatency() * 1.2;
+        for (Map.Entry<BlockPos, Long> entry : pendingBlocks.entrySet()) {
+            if (System.currentTimeMillis() - entry.getValue() <= latency) continue;
+            synchronized (pendingBlocks) {
+                pendingBlocks.remove(entry.getKey());
+            }
+        }
     }
 }

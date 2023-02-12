@@ -1,2 +1,3 @@
-# reaper-addon
-source code for the outdated addon. compiles with latest meteor dev builds
+# Reaper Plus
+An updated version of Reaper, mainly just for CEONOS, with the goal of 
+making the addon actually usable while retaining most of its originality.

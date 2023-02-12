@@ -163,11 +163,11 @@ public class ExternalHUD extends ReaperModule {
         if (bps.get()) info.add("BPS: " + String.format("%.1f", Utils.getPlayerSpeed()));
         if (ping.get()) info.add("Ping: " + getPing());
         if (biome.get()) info.add("Biome: " + getBiome());
-        if (kills.get()) info.add("Kills: " + Stats.kills);
-        if (deaths.get()) info.add("Deaths: " + Stats.deaths);
+        if (kills.get()) info.add("Kills: " + Statistics.getKills());
+        if (deaths.get()) info.add("Deaths: " + Statistics.getDeaths());
         if (kd.get()) info.add("KD: " + Statistics.getKDR());
-        if (killstreak.get()) info.add("Killstreak: " + Stats.killStreak);
-        if (highscore.get()) info.add("Highscore: " + Stats.highscore);
+        if (killstreak.get()) info.add("Killstreak: " + Statistics.getStreak());
+        if (highscore.get()) info.add("Highscore: " + Statistics.getHighScore());
         info.add("");
         if (coords.get()) info.addAll(getCoords());
         if (showSpotify.get()) info.addAll(getSpotify());

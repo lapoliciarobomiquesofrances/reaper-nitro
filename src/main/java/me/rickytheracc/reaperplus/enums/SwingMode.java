@@ -1,16 +1,16 @@
 package me.rickytheracc.reaperplus.enums;
 
 public enum SwingMode {
-    BOTH,
-    PACKET,
-    CLIENT,
-    NONE;
+    Both,
+    Packet,
+    Client,
+    None;
 
     public boolean client() {
-        return this == CLIENT || this == BOTH;
+        return this == Client || this == Both;
     }
 
     public boolean packet() {
-        return this == PACKET || this == BOTH;
+        return this == Packet || this == Both;
     }
 }

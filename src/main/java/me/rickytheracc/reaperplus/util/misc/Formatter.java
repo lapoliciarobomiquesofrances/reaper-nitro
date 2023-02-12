@@ -1,6 +1,7 @@
 package me.rickytheracc.reaperplus.util.misc;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
+import me.rickytheracc.reaperplus.util.combat.Statistics;
 import me.rickytheracc.reaperplus.util.services.SpotifyService;
 import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
@@ -50,10 +51,10 @@ public class Formatter {
 
     public static String applyPlaceholders(String m) {
         // stats
-        if (m.contains("{highscore}")) m = m.replace("{highscore}", String.valueOf(Stats.highscore));
-        if (m.contains("{killstreak}")) m = m.replace("{killstreak}", String.valueOf(Stats.killStreak));
-        if (m.contains("{kills}")) m = m.replace("{kills}", String.valueOf(Stats.kills));
-        if (m.contains("{deaths}")) m = m.replace("{deaths}", String.valueOf(Stats.deaths));
+        if (m.contains("{highscore}")) m = m.replace("{highscore}", String.valueOf(Statistics.getHighScore()));
+        if (m.contains("{killstreak}")) m = m.replace("{killstreak}", String.valueOf(Statistics.getStreak()));
+        if (m.contains("{kills}")) m = m.replace("{kills}", String.valueOf(Statistics.getKills()));
+        if (m.contains("{deaths}")) m = m.replace("{deaths}", String.valueOf(Statistics.getDeaths()));
 
         // minecraft
         if (m.contains("{server}")) m = m.replace("{server}", Utils.getWorldName());
@@ -133,20 +134,8 @@ public class Formatter {
     }
 
     // for Killfeed HUD module lol
-    public static boolean hasKillFeed() { return Stats.killfeed.isEmpty();}
-    public static ArrayList<String> getKillFeed() { return Stats.killfeed;}
-
-
-    public static String getKillstreak() {
-        return " | Killstreak: " + Stats.killStreak;
-    }
-    public static String getSuffix() {
-        return " | Ｒｅａｐｅｒ | ＢｅｄＧｏｄ";
-    }
-    public static String getReaperSuffix() {return " | Ｒｅａｐｅｒ | ";}
-    public static String getBedGodSuffix() {return " | ＢｅｄＧｏｄ |";}
-
-
+    public static boolean hasKillFeed() { return Statistics.killfeed.isEmpty();}
+    public static ArrayList<String> getKillFeed() { return Statistics.killfeed;}
 
     //public static Random random = new Random();
     public static int random(int min, int max) { return min + (int) (Math.random() * ((max - min) + 1)); }

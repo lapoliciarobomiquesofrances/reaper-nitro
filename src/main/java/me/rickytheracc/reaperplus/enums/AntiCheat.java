@@ -1,15 +1,14 @@
 package me.rickytheracc.reaperplus.enums;
 
+import me.rickytheracc.reaperplus.util.player.PlayerUtil;
 import net.minecraft.util.math.Vec3d;
 
-import static meteordevelopment.meteorclient.MeteorClient.mc;
-
 public enum AntiCheat {
-    VANILLA,
-    NOCHEAT;
+    Vanilla,
+    NoCheat;
 
     public Vec3d origin() {
-        if (this == NOCHEAT) return mc.player.getEyePos();
-        return mc.player.getPos();
+        if (this == NoCheat) return PlayerUtil.properEyePos();
+        return PlayerUtil.properFeetPos();
     }
 }

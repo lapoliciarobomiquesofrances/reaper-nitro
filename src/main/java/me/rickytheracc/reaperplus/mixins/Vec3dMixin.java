@@ -1,6 +1,7 @@
 package me.rickytheracc.reaperplus.mixins;
 
 import me.rickytheracc.reaperplus.mixininterface.IVec3d;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,11 @@ public class Vec3dMixin implements IVec3d {
     @Override
     public void set(@NotNull Vec3i vec) {
         set(vec.getX(), vec.getY(), vec.getZ());
+    }
+
+    @Override
+    public void set(@NotNull BlockPos pos) {
+        set(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
     }
 
     @Override

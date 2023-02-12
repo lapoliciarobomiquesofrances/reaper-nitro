@@ -76,7 +76,7 @@ public class ReaperPlus extends MeteorAddon {
             .set("deaths", Statistics::getDeaths)
             .set("kdr", Statistics::getKDR)
             .set("killstreak", Statistics::getStreak)
-            .set("highscore", Statistics::getHighSore)
+            .set("highscore", Statistics::getHighScore)
             .set("timeplayed", Statistics::getPlaytime)
             .set("crystalsps", Statistics::getCrystalsPs)
         );

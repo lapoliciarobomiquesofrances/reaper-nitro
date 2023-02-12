@@ -2,7 +2,7 @@ package me.rickytheracc.reaperplus.modules.misc;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.util.combat.Statistics;
-import me.rickytheracc.reaperplus.util.misc.MessageUtil;
+import me.rickytheracc.reaperplus.util.player.StringUtil;
 import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
 import meteordevelopment.meteorclient.settings.*;
@@ -74,9 +74,9 @@ public class AutoRespawn extends ReaperModule {
 
         mc.player.requestRespawn();
 
-        if (autoRekit.get()) MessageUtil.sendNormalMessage("/kit " + kitName.get(), packet.get());
-        if (excuse.get()) MessageUtil.sendNormalMessage(getExcuseMessage(), packet.get());
-        if (alertHS.get()) info("Your highscore is " + Statistics.getHighSore() + "!");
+        if (autoRekit.get()) StringUtil.sendNormalMessage("/kit " + kitName.get(), packet.get());
+        if (excuse.get()) StringUtil.sendNormalMessage(getExcuseMessage(), packet.get());
+        if (alertHS.get()) info("Your highscore is " + Statistics.getHighScore() + "!");
     }
 
     private String getExcuseMessage() {

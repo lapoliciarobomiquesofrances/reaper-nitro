@@ -1,37 +1,63 @@
 package me.rickytheracc.reaperplus.modules.combat;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
+import me.rickytheracc.reaperplus.enums.AntiCheat;
+import me.rickytheracc.reaperplus.enums.ResistType;
+import me.rickytheracc.reaperplus.enums.SwingMode;
+import me.rickytheracc.reaperplus.enums.SwitchMode;
+import me.rickytheracc.reaperplus.mixininterface.IVec3d;
+import me.rickytheracc.reaperplus.util.combat.Ranges;
 import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import me.rickytheracc.reaperplus.util.player.Interactions;
-import me.rickytheracc.reaperplus.util.world.BlockHelper;
+import me.rickytheracc.reaperplus.util.player.PlayerUtil;
+import me.rickytheracc.reaperplus.util.world.BlockUtil;
 import me.rickytheracc.reaperplus.util.world.CombatHelper;
 import meteordevelopment.meteorclient.events.world.TickEvent;
+import meteordevelopment.meteorclient.mixin.AbstractBlockAccessor;
+import meteordevelopment.meteorclient.mixininterface.IBox;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.friends.Friends;
-import meteordevelopment.meteorclient.utils.entity.EntityUtils;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
-import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.TntEntity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.*;
+import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class SmartHoleFill extends ReaperModule {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgTargeting = settings.createGroup("Targeting");
     private final SettingGroup sgRange = settings.createGroup("Ranges");
-    private final SettingGroup sgPause = settings.createGroup("Pause");
     private final SettingGroup sgRender = settings.createGroup("Pause");
 
     // General
+
+    private final Setting<AntiCheat> antiCheat = sgGeneral.add(new EnumSetting.Builder<AntiCheat>()
+        .name("anti-cheat")
+        .description("Which anti cheat the server uses.")
+        .defaultValue(AntiCheat.NoCheat)
+        .build()
+    );
+
+    private final Setting<SwitchMode> switchMode = sgGeneral.add(new EnumSetting.Builder<SwitchMode>()
+        .name("switch-mode")
+        .description("How to swap to the block while filling holes.")
+        .defaultValue(SwitchMode.Silent)
+        .build()
+    );
 
     private final Setting<Integer> placeDelay = sgGeneral.add(new IntSetting.Builder()
         .name("place-delay")
@@ -63,7 +89,9 @@ public class SmartHoleFill extends ReaperModule {
         .description("What blocks to use for surround.")
         .defaultValue(
             Blocks.OBSIDIAN,
-            Blocks.COBWEB
+            Blocks.COBWEB,
+            Blocks.NETHERITE_BLOCK,
+            Blocks.CRYING_OBSIDIAN
         )
         .filter(this::blockFilter)
         .build()
@@ -76,14 +104,14 @@ public class SmartHoleFill extends ReaperModule {
         .build()
     );
 
-    public final Setting<Boolean> pauseOnUse = sgPause.add(new BoolSetting.Builder()
+    public final Setting<Boolean> pauseOnUse = sgGeneral.add(new BoolSetting.Builder()
         .name("pause-on-use")
         .description("Pauses while using an item.")
         .defaultValue(true)
         .build()
     );
 
-    public final Setting<Boolean> pauseOnMine = sgPause.add(new BoolSetting.Builder()
+    public final Setting<Boolean> pauseOnMine = sgGeneral.add(new BoolSetting.Builder()
         .name("pause-on-mine")
         .description("Pauses while mining a block.")
         .defaultValue(true)
@@ -101,12 +129,7 @@ public class SmartHoleFill extends ReaperModule {
         .defaultValue(50)
         .min(1)
         .sliderMax(100)
-        .build()
-    );
-
-    private final Setting<Boolean> debug = sgGeneral.add(new BoolSetting.Builder()
-        .name("debug")
-        .defaultValue(false)
+        .visible(rotate::get)
         .build()
     );
 
@@ -121,7 +144,7 @@ public class SmartHoleFill extends ReaperModule {
         .build()
     );
 
-    private final Setting<Boolean> fillDoubles = sgTargeting.add(new BoolSetting.Builder()
+    private final Setting<Boolean> doubles = sgTargeting.add(new BoolSetting.Builder()
         .name("fill-doubles")
         .description("Fill double holes.")
         .defaultValue(true)
@@ -154,8 +177,8 @@ public class SmartHoleFill extends ReaperModule {
     private final Setting<Double> targetRange = sgRange.add(new DoubleSetting.Builder()
         .name("target-range")
         .description("How far away to target players.")
-        .defaultValue(4)
-        .sliderRange(0,10)
+        .defaultValue(10)
+        .sliderRange(0,20)
         .build()
     );
 
@@ -168,7 +191,7 @@ public class SmartHoleFill extends ReaperModule {
         .build()
     );
 
-    private final Setting<Double> targetXDistance = sgRange.add(new DoubleSetting.Builder()
+    private final Setting<Double> targetXZDistance = sgRange.add(new DoubleSetting.Builder()
         .name("target-XZ-distance")
         .description("How close to a hole an enemy must be horizontally to fill it.")
         .defaultValue(2.5)
@@ -188,27 +211,51 @@ public class SmartHoleFill extends ReaperModule {
 
     // Render
 
+    private final Setting<SwingMode> swingMode = sgRender.add(new EnumSetting.Builder<SwingMode>()
+        .name("swing-mode")
+        .description("How to swing your hand while filling holes.")
+        .defaultValue(SwingMode.Packet)
+        .build()
+    );
+
     public final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder()
         .name("render")
+        .description("Render the blocks being placed.")
         .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Integer> fadeTime = sgRender.add(new IntSetting.Builder()
+        .name("fade-time")
+        .description("How long the renders should take to fade out.")
+        .defaultValue(8)
+        .min(1)
+        .sliderRange(1,20)
+        .visible(render::get)
         .build()
     );
 
     public final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
         .name("shape-mode")
+        .description("The shape mode of the renders.")
         .defaultValue(ShapeMode.Both)
+        .visible(render::get)
         .build()
     );
 
     public final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
         .name("side-color")
+        .description("The side color of the renders.")
         .defaultValue(new SettingColor(114, 11, 135,75))
+        .visible(() -> render.get() && shapeMode.get().sides())
         .build()
     );
 
     public final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
         .name("line-color")
+        .description("The line color of the renders.")
         .defaultValue(new SettingColor(114, 11, 135))
+        .visible(() -> render.get() && shapeMode.get().lines())
         .build()
     );
 
@@ -217,6 +264,13 @@ public class SmartHoleFill extends ReaperModule {
     }
 
     List<PlayerEntity> targets = new ArrayList<>();
+    List<BlockPos> blockPosList = new ArrayList<>();
+    List<BlockPos> holes = new ArrayList<>();
+
+    private final BlockPos.Mutable testPos = new BlockPos.Mutable();
+    private final Box testBox= new Box(0, 0, 0, 0, 0, 0);
+    private Vec3d testVec;
+
     private int delay, blocksPlaced;
 
     @Override
@@ -226,8 +280,8 @@ public class SmartHoleFill extends ReaperModule {
         delay = 0;
     }
 
-    @EventHandler
-    private void onTick(TickEvent.Post event) {
+    @EventHandler(priority = EventPriority.HIGH)
+    private void onTick(TickEvent.Pre event) {
         if (delay > 0) {
             delay--;
             return;
@@ -235,6 +289,14 @@ public class SmartHoleFill extends ReaperModule {
             delay = placeDelay.get();
             blocksPlaced = 0;
         }
+
+        boolean shouldFill = switch (fillMode.get()) {
+            case Both -> Interactions.isBurrowed() && Interactions.isInHole();
+            case Burrow -> Interactions.isBurrowed();
+            case InHole -> Interactions.isInHole();
+            case Always -> true;
+        };
+        if (!shouldFill) return;
 
         if (pauseOnUse.get() && mc.player.isUsingItem()) return;
         if (pauseOnMine.get() && mc.interactionManager.isBreakingBlock()) return;
@@ -249,36 +311,92 @@ public class SmartHoleFill extends ReaperModule {
             if (player.isCreative() || player == mc.player || player.isDead() || !Friends.get().shouldAttack(player)) continue;
             if (player.squaredDistanceTo(mc.player) > targetRange.get() * targetRange.get()) continue;
             if (ignoreSafe.get()) if (CombatHelper.isInHole(player)) continue;
-            if (onlyMoving.get()) {
-                double dX = player.getX() - player.prevX;
-                double dY = player.getY() - player.prevY;
-                double dZ = player.getZ() - player.prevZ;
-                if (dX == 0 && dY == 0 && dZ == 0) continue;
-            }
+            if (onlyMoving.get()) if (!PlayerUtil.isMoving(player)) continue;
             targets.add(player);
         }
 
         if (targets.isEmpty()) return;
 
+        // Find holes
+        blockPosList.clear();
+        holes.clear();
+        blockPosList= BlockUtil.getSphere(mc.player, placeRange.get(), antiCheat.get());
 
+        Iterator<BlockPos> iterator = blockPosList.iterator();
+        while (iterator.hasNext()) {
+            BlockPos blockPos = iterator.next();
+            if (!validHole(blockPos)) iterator.remove();
 
-        delayTimer--;
-        if (delayTimer <= 0) {
-            delayTimer = placeDelay.get();
-            if (debug.get()) info("Getting holes");
-            List<BlockPos> holes = BlockHelper.getHoles(mc.player.getBlockPos(), selfHoleRangeH.get(), selfHoleRangeV.get()); // get all nearby holes
-            if (debug.get()) info("Starting list size: " + holes.size());
-            holes.removeIf(hole -> BlockHelper.distanceBetween(target.getBlockPos(), hole) <= targetHoleRange.get()); // check target distance to hole
-            if (debug.get()) info("List size after range check: " + holes.size());
-            renderBlocks.addAll(holes);
-            int filled = 0;
-            for (BlockPos hole : holes) { // iterate through them
-                BlockUtils.place(hole, item, rotate.get(), rotatePrio.get(), true);
-                renderBlocks.removeIf(renderBlock -> BlockHelper.getBlock(renderBlock) != Blocks.AIR);
-                filled++;
-                if (filled >= holesPerTick.get()) break;
+            int bedrock = 0, obsidian = 0;
+            Direction air = null;
+
+            for (Direction direction : Direction.values()) {
+                if (direction == Direction.UP) continue;
+
+                BlockPos offsetPos = blockPos.offset(direction);
+                if (BlockUtil.resistant(blockPos, ResistType.PERMANENT)) bedrock++;
+                else if (BlockUtil.resistant(blockPos, ResistType.BREAKABLE)) obsidian++;
+
+                else if (mc.world.getBlockState(offsetPos).isAir() && !doubles.get()) iterator.remove();
+                else if (direction == Direction.DOWN || air != null) iterator.remove();
+
+                else if (validHole(offsetPos)) {
+                    for (Direction dir : Direction.values()) {
+                        if (dir == direction.getOpposite() || dir == Direction.UP) continue;
+
+                        if (BlockUtil.resistant(blockPos, ResistType.PERMANENT)) bedrock++;
+                        else if (BlockUtil.resistant(blockPos, ResistType.BREAKABLE)) obsidian++;
+                        else iterator.remove();
+                    }
+
+                    air = direction;
+                }
+            }
+
+            if (obsidian + bedrock == 5 && air == null) {
+                holes.add(blockPos);
+            } else if (obsidian + bedrock == 8 && doubles.get() && air != null) {
+                holes.add(blockPos);
+                holes.add(blockPos.offset(air));
             }
         }
+
+        for (BlockPos pos : holes) {
+        }
+
+    }
+
+    private boolean validHole(BlockPos pos) {
+        testPos.set(pos);
+
+        if (!Ranges.inBlockRange(pos, antiCheat.get(), placeRange.get())) return false;
+
+        WorldChunk chunk = mc.world.getChunk(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ()));
+        BlockState state = chunk.getBlockState(pos);
+        if (state.getBlock() == Blocks.COBWEB) return false;
+
+        if (((AbstractBlockAccessor) mc.world.getBlockState(testPos).getBlock()).isCollidable()) return false;
+        testPos.set(testPos.up());
+        if (((AbstractBlockAccessor) mc.world.getBlockState(testPos).getBlock()).isCollidable()) return false;
+        testPos.set(testPos.down());
+
+        ((IBox) testBox).set(pos);
+        if (!mc.world.getOtherEntities(null, testBox, entity
+            -> entity instanceof PlayerEntity
+            || entity instanceof TntEntity
+            || entity instanceof EndCrystalEntity
+        ).isEmpty()) return false;
+
+        ((IVec3d) testVec).set(pos);
+        testVec = testVec.add(0, 0.5, 0);
+
+        return targets.stream().anyMatch(target -> {
+            boolean yCheck = target.getY() > testVec.y && target.getY() - testVec.y <= targetYDistance.get();
+            double dX = target.getX() - testVec.x, dZ = target.getZ() - testVec.z;
+            boolean xzCheck = Math.sqrt(dX * dX + dZ * dZ) <= targetXZDistance.get();
+
+            return yCheck && xzCheck;
+        });
     }
 
     private FindItemResult getItemResult() {
@@ -287,17 +405,6 @@ public class SmartHoleFill extends ReaperModule {
             if (cobwebs.found()) return cobwebs;
         }
         return InvUtils.findInHotbar(itemStack -> blocks.get().contains(Block.getBlockFromItem(itemStack.getItem())));
-    }
-
-    private boolean shouldFill() {
-        if (debug.get()) info("Checking should fill");
-
-        return switch (fillMode.get()) {
-            case Both -> Interactions.isBurrowed() && Interactions.isInHole();
-            case Burrow -> Interactions.isBurrowed();
-            case InHole -> Interactions.isInHole();
-            case Always -> true;
-        };
     }
 
     private boolean blockFilter(Block block) {
@@ -309,10 +416,10 @@ public class SmartHoleFill extends ReaperModule {
             || block == Blocks.COBWEB;
     }
 
-
     @Override
     public String getInfoString() {
-        return EntityUtils.getName(target);
+        if (targets.isEmpty()) return null;
+        return String.valueOf(targets.size());
     }
 
     public enum CheckMode {

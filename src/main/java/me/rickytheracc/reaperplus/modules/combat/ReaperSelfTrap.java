@@ -70,7 +70,7 @@ public class ReaperSelfTrap extends ReaperModule {
 
 
     public ReaperSelfTrap(){
-        super(ReaperPlus.R, "self-trap-plus", "Places obsidian around your head.");
+        super(ReaperPlus.R, "reaper-self-trap", "Places obsidian around your head.");
     }
 
     @Override

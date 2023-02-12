@@ -1,4 +1,4 @@
-package me.rickytheracc.reaperplus.util.misc;
+package me.rickytheracc.reaperplus.util.player;
 
 import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
@@ -6,7 +6,7 @@ import net.minecraft.text.Text;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
-public class MessageUtil {
+public class StringUtil {
     public static void sendNormalMessage(String text, boolean packet) {
         if (packet) {
             if (!Utils.canUpdate()) return;
