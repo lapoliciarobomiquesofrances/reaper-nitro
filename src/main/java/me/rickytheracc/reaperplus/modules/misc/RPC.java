@@ -105,7 +105,7 @@ public class RPC extends ReaperModule {
 
         String mainT, subT;
         if (Utils.canUpdate()) {
-            if (showSpotify.get() && SpotifyService.hasMedia() && Formatter.random(1, 3) == 3) {
+            if (showSpotify.get() && SpotifyService.hasMedia() && MathUtil.random(1, 3) == 3) {
                 mainT = Formatter.getCurrentTrack();
                 subT = Formatter.getCurrentArtist();
             } else {

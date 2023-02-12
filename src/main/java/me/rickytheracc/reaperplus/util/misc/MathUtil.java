@@ -8,11 +8,21 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class MathUtil {
+    public static final Random RANDOM = new Random();
+
+    public static int random(int min, int max) {
+        return RANDOM.nextInt(min, max);
+    }
+
+    public static double random(double min, double max) {
+        return RANDOM.nextDouble(min, max);
+    }
 
     public static int intToTicks(int i) {
         return i * 20;
@@ -88,7 +98,4 @@ public class MathUtil {
 
         return new double[] {posX, posZ};
     }
-
-
-
 }

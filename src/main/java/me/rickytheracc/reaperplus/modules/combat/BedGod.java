@@ -245,13 +245,13 @@ public class BedGod extends ReaperModule {
     private int getZeroTick() {
         int t;
         if (!CombatHelper.isInHole(target)) {
-            if (Interactions.findBedInAll().count() >= zeroTickMinBed.get()) t = Formatter.randInt(0, 3);
+            if (Interactions.findBedInAll().count() >= zeroTickMinBed.get()) t = MathUtil.random(0, 3);
             else t = 5;
         } else {
             if (Interactions.findBedInAll().count() < zeroTickMinBed.get()) {
-                t = Formatter.randInt(2, 4);
+                t = MathUtil.random(2, 4);
             } else {
-                t = Formatter.randInt(0, 3);
+                t = MathUtil.random(0, 3);
                 if (CombatHelper.isSelfTrapped(target)) t = 0; // 0 tick delay for self trap
             }
         }
