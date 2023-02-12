@@ -176,6 +176,7 @@ public class Statistics {
                 if (player == mc.player) {
                     deaths++;
                     killStreak = 0;
+                    killfeed.clear();
                 } else if (wasTarget) {
                     kills++;
                     killStreak++;

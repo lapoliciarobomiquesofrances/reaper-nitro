@@ -4,10 +4,11 @@ import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.player.Interactions;
 import me.rickytheracc.reapernitro.util.world.BlockHelper;
-import meteordevelopment.meteorclient.events.render.Render3DEvent;
+import me.rickytheracc.reapernitro.util.world.CombatHelper;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.friends.Friends;
 import meteordevelopment.meteorclient.utils.entity.EntityUtils;
 import meteordevelopment.meteorclient.utils.entity.SortPriority;
 import meteordevelopment.meteorclient.utils.entity.TargetUtils;
@@ -24,84 +25,242 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class SmartHoleFill extends ReaperModule {
-
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
+    private final SettingGroup sgTargeting = settings.createGroup("Targeting");
     private final SettingGroup sgRange = settings.createGroup("Ranges");
     private final SettingGroup sgPause = settings.createGroup("Pause");
     private final SettingGroup sgRender = settings.createGroup("Pause");
 
+    // General
 
-    private final Setting<Boolean> debug = sgGeneral.add(new BoolSetting.Builder().name("debug").defaultValue(false).build());
-    private final Setting<CheckMode> fillMode = sgGeneral.add(new EnumSetting.Builder<CheckMode>().name("fill-mode").description("When to fill holes.").defaultValue(CheckMode.Either).build());
-    private final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder().name("block").description("What blocks to use for surround.").defaultValue(Collections.singletonList(Blocks.OBSIDIAN)).filter(this::blockFilter).build());
-    private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder().name("fill-delay").description("Delay between filling holes.").defaultValue(1).min(0).sliderMax(10).build());
-    private final Setting<Integer> holesPerTick = sgGeneral.add(new IntSetting.Builder().name("holes-per-tick").description("How many holes to fill per tick.").defaultValue(3).min(0).sliderMax(10).build());
-    private final Setting<Integer> targetRange = sgGeneral.add(new IntSetting.Builder().name("target-range").description("How far to target players from.").defaultValue(4).min(1).sliderMax(10).build());
-    private final Setting<SortPriority> targetPriority = sgGeneral.add(new EnumSetting.Builder<SortPriority>().name("target-priority").description("How to select the player to target.").defaultValue(SortPriority.LowestHealth).build());
-    private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder().name("rotate").defaultValue(true).build());
-    private final Setting<Integer> rotatePrio = sgGeneral.add(new IntSetting.Builder().name("rotate-priority").defaultValue(50).min(1).sliderMax(100).build());
+    private final Setting<Integer> placeDelay = sgGeneral.add(new IntSetting.Builder()
+        .name("place-delay")
+        .description("Delay between placing in holes.")
+        .defaultValue(1)
+        .min(0)
+        .sliderMax(10)
+        .build()
+    );
+
+    private final Setting<Integer> holesPerTick = sgGeneral.add(new IntSetting.Builder()
+        .name("holes-/-tick")
+        .description("How many holes to fill per tick.")
+        .defaultValue(3)
+        .min(0)
+        .sliderMax(10)
+        .build()
+    );
+
+    private final Setting<CheckMode> fillMode = sgGeneral.add(new EnumSetting.Builder<CheckMode>()
+        .name("fill-mode")
+        .description("When to fill holes.")
+        .defaultValue(CheckMode.Always)
+        .build()
+    );
+
+    private final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder()
+        .name("block")
+        .description("What blocks to use for surround.")
+        .defaultValue(
+            Blocks.OBSIDIAN,
+            Blocks.COBWEB
+        )
+        .filter(this::blockFilter)
+        .build()
+    );
+
+    private final Setting<Boolean> preferWebs = sgGeneral.add(new BoolSetting.Builder()
+        .name("prefer-webs")
+        .description("Always use webs if they're available.")
+        .defaultValue(true)
+        .build()
+    );
+
+    public final Setting<Boolean> pauseOnUse = sgPause.add(new BoolSetting.Builder()
+        .name("pause-on-use")
+        .description("Pauses while using an item.")
+        .defaultValue(true)
+        .build()
+    );
+
+    public final Setting<Boolean> pauseOnMine = sgPause.add(new BoolSetting.Builder()
+        .name("pause-on-mine")
+        .description("Pauses while mining a block.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
+        .name("rotate")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Integer> rotatePrio = sgGeneral.add(new IntSetting.Builder()
+        .name("rotate-priority")
+        .defaultValue(50)
+        .min(1)
+        .sliderMax(100)
+        .build()
+    );
+
+    private final Setting<Boolean> debug = sgGeneral.add(new BoolSetting.Builder()
+        .name("debug")
+        .defaultValue(false)
+        .build()
+    );
+
+    // Targeting
+
+    private final Setting<Integer> maxTargets = sgTargeting.add(new IntSetting.Builder()
+        .name("max-targets")
+        .description("How many targets to fill at once.")
+        .defaultValue(3)
+        .min(1)
+        .sliderRange(1,5)
+        .build()
+    );
+
+    private final Setting<Boolean> onlyMoving = sgTargeting.add(new BoolSetting.Builder()
+        .name("only-moving")
+        .description("Only fill holes of players that are moving.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> ignoreSafe = sgTargeting.add(new BoolSetting.Builder()
+        .name("ignore-safe")
+        .description("Ignore players that are already in holes.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> predict = sgTargeting.add(new BoolSetting.Builder()
+        .name("predict")
+        .description("Predict where a player will be next tick.")
+        .defaultValue(false)
+        .build()
+    );
 
     // Ranges
-    private final Setting<Integer> selfHoleRangeH = sgRange.add(new IntSetting.Builder().name("self-range-horizontal").description("Horizontal place range.").defaultValue(4).min(0).sliderMax(10).build());
-    private final Setting<Integer> selfHoleRangeV = sgRange.add(new IntSetting.Builder().name("self-range-vertical").description("Vertical place range.").defaultValue(2).min(0).sliderMax(10).build());
-    private final Setting<Integer> targetHoleRange = sgRange.add(new IntSetting.Builder().name("target-range").description("How close the target needs to be to the hole.").defaultValue(2).min(0).sliderMax(10).build());
 
-    // Pause
-    public final Setting<Boolean> pauseOnEat = sgPause.add(new BoolSetting.Builder().name("pause-on-eat").description("Pauses while eating.").defaultValue(true).build());
-    public final Setting<Boolean> pauseOnDrink = sgPause.add(new BoolSetting.Builder().name("pause-on-drink").description("Pauses while drinking.").defaultValue(true).build());
-    public final Setting<Boolean> pauseOnMine = sgPause.add(new BoolSetting.Builder().name("pause-on-mine").description("Pauses while mining.").defaultValue(true).build());
-    public final Setting<Boolean> pauseOnGap = sgPause.add(new BoolSetting.Builder().name("pause-on-gap").description("Pauses while holding a gap.").defaultValue(false).build());
+    private final Setting<Double> targetRange = sgRange.add(new DoubleSetting.Builder()
+        .name("target-range")
+        .description("How far away to target players.")
+        .defaultValue(4)
+        .sliderRange(0,10)
+        .build()
+    );
+
+    private final Setting<Double> placeRange = sgRange.add(new DoubleSetting.Builder()
+        .name("place-range")
+        .description("How far away to try and place blocks.")
+        .defaultValue(4.5)
+        .min(0)
+        .sliderRange(0,6)
+        .build()
+    );
+
+    private final Setting<Double> targetXDistance = sgRange.add(new DoubleSetting.Builder()
+        .name("target-XZ-distance")
+        .description("How close to a hole an enemy must be horizontally to fill it.")
+        .defaultValue(2.5)
+        .min(0)
+        .sliderRange(0,5)
+        .build()
+    );
+
+    private final Setting<Double> targetYDistance = sgRange.add(new DoubleSetting.Builder()
+        .name("target-Y-distance")
+        .description("How close to a hole an enemy must be vertically to fill it.")
+        .defaultValue(4)
+        .min(0)
+        .sliderRange(0,5)
+        .build()
+    );
 
     // Render
-    public final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder().name("render").defaultValue(true).build());
-    public final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>().name("shape-mode").defaultValue(ShapeMode.Both).build());
-    public final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder().name("side-color").defaultValue(new SettingColor(114, 11, 135,75)).build());
-    public final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder().name("line-color").defaultValue(new SettingColor(114, 11, 135)).build());
+
+    public final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder()
+        .name("render")
+        .defaultValue(true)
+        .build()
+    );
+
+    public final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
+        .name("shape-mode")
+        .defaultValue(ShapeMode.Both)
+        .build()
+    );
+
+    public final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
+        .name("side-color")
+        .defaultValue(new SettingColor(114, 11, 135,75))
+        .build()
+    );
+
+    public final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
+        .name("line-color")
+        .defaultValue(new SettingColor(114, 11, 135))
+        .build()
+    );
 
     public SmartHoleFill() {
         super(Reaper.R, "smart-holefill", "Hole fill but smart");
     }
 
-    private int delayTimer = 0;
-    private PlayerEntity target;
-    private final ArrayList<BlockPos> renderBlocks = new ArrayList<>();
+    List<PlayerEntity> targets = new ArrayList<>();
+    private int delay, blocksPlaced;
+
+    @Override
+    public void onActivate() {
+        targets.clear();
+        blocksPlaced = 0;
+        delay = 0;
+    }
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        FindItemResult item = InvUtils.findInHotbar(itemStack -> blocks.get().contains(Block.getBlockFromItem(itemStack.getItem())));
-        if (!item.found()) {
-            error("No obby in hotbar!");
-            toggle();
+        if (delay > 0) {
+            delay--;
             return;
+        } else {
+            delay = placeDelay.get();
+            blocksPlaced = 0;
         }
+
+        if (pauseOnUse.get() && mc.player.isUsingItem()) return;
+        if (pauseOnMine.get() && mc.interactionManager.isBreakingBlock()) return;
+
+        // Get item
+        FindItemResult item = getItemResult();
+        if (!item.found()) return;
+
         // Targeting
-        target = TargetUtils.getPlayerTarget(targetRange.get(), targetPriority.get());
-        if (TargetUtils.isBadTarget(target, targetRange.get())) target = TargetUtils.getPlayerTarget(targetRange.get(), targetPriority.get());
-        if (target == null) {
-            renderBlocks.clear();
-            return;
+        targets.clear();
+        for (PlayerEntity player : mc.world.getPlayers()) {
+            if (player.isCreative() || player == mc.player || player.isDead() || !Friends.get().shouldAttack(player)) continue;
+            if (player.squaredDistanceTo(mc.player) > targetRange.get() * targetRange.get()) continue;
+            if (ignoreSafe.get()) if (CombatHelper.isInHole(player)) continue;
+            if (onlyMoving.get()) {
+                double dX = player.getX() - player.prevX;
+                double dY = player.getY() - player.prevY;
+                double dZ = player.getZ() - player.prevZ;
+                if (dX == 0 && dY == 0 && dZ == 0) continue;
+            }
+            targets.add(player);
         }
+
+        if (targets.isEmpty()) return;
+
         // Pauses
-        if (debug.get()) info("Checking pauses");
-        if (!shouldFill()) {
-            if (debug.get()) info("ShouldFill is false");
-            return;
-        }
-        if (PlayerUtils.shouldPause(pauseOnMine.get(), pauseOnEat.get(), pauseOnDrink.get())) {
-            if (debug.get()) info("Pausing on mine/eat/drink");
-            return;
-        }
-        if (Interactions.isHolding(Items.ENCHANTED_GOLDEN_APPLE) && pauseOnGap.get()) {
-            if (debug.get()) info("Pausing on heldGap");
-            return;
-        }
+
         delayTimer--;
         if (delayTimer <= 0) {
-            delayTimer = delay.get();
+            delayTimer = placeDelay.get();
             if (debug.get()) info("Getting holes");
             List<BlockPos> holes = BlockHelper.getHoles(mc.player.getBlockPos(), selfHoleRangeH.get(), selfHoleRangeV.get()); // get all nearby holes
             if (debug.get()) info("Starting list size: " + holes.size());
@@ -118,32 +277,32 @@ public class SmartHoleFill extends ReaperModule {
         }
     }
 
+    private FindItemResult getItemResult() {
+        if (preferWebs.get()) {
+            FindItemResult cobwebs = InvUtils.findInHotbar(Items.COBWEB);
+            if (cobwebs.found()) return cobwebs;
+        }
+        return InvUtils.findInHotbar(itemStack -> blocks.get().contains(Block.getBlockFromItem(itemStack.getItem())));
+    }
+
     private boolean shouldFill() {
         if (debug.get()) info("Checking should fill");
-        boolean shouldFill = false;
-        switch (fillMode.get()) {
-            case Either -> { if (Interactions.isInHole() || Interactions.isBurrowed()) shouldFill = true; }
-            case Burrowed -> shouldFill = Interactions.isBurrowed();
-            case InHole -> shouldFill = Interactions.isInHole();
-            case None -> shouldFill = true;
-        }
-        return shouldFill;
+
+        return switch (fillMode.get()) {
+            case Both -> Interactions.isBurrowed() && Interactions.isInHole();
+            case Burrow -> Interactions.isBurrowed();
+            case InHole -> Interactions.isInHole();
+            case Always -> true;
+        };
     }
 
     private boolean blockFilter(Block block) {
-        return block == Blocks.OBSIDIAN ||
-            block == Blocks.CRYING_OBSIDIAN ||
-            block == Blocks.NETHERITE_BLOCK ||
-            block == Blocks.ENDER_CHEST ||
-            block == Blocks.RESPAWN_ANCHOR;
-    }
-
-    @EventHandler
-    private void onRender(Render3DEvent event) {
-        if (render.get()) {
-            renderBlocks.removeIf(renderBlock -> BlockHelper.getBlock(renderBlock) != Blocks.AIR);
-            renderBlocks.forEach(blockPos -> event.renderer.box(blockPos, sideColor.get(), lineColor.get(), shapeMode.get(), 0));
-        }
+        return block == Blocks.OBSIDIAN
+            || block == Blocks.CRYING_OBSIDIAN
+            || block == Blocks.NETHERITE_BLOCK
+            || block == Blocks.ENDER_CHEST
+            || block == Blocks.RESPAWN_ANCHOR
+            || block == Blocks.COBWEB;
     }
 
 
@@ -153,10 +312,10 @@ public class SmartHoleFill extends ReaperModule {
     }
 
     public enum CheckMode {
+        Always,
         InHole,
-        Burrowed,
-        Either,
-        None
+        Burrow,
+        Both
     }
 
 }

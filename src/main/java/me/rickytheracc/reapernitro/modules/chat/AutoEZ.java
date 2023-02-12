@@ -3,7 +3,7 @@ package me.rickytheracc.reapernitro.modules.chat;
 import me.rickytheracc.reapernitro.Reaper;
 import me.rickytheracc.reapernitro.events.DeathEvent;
 import me.rickytheracc.reapernitro.util.combat.Statistics;
-import me.rickytheracc.reapernitro.util.misc.MessageUtil2;
+import me.rickytheracc.reapernitro.util.misc.MessageUtil;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
@@ -113,8 +113,8 @@ public class AutoEZ extends ReaperModule {
         if (useKillstreak.get()) message += " Killstreak: " + Statistics.getStreak();
         if (useSuffix.get()) message += suffix.get(); // add suffix
 
-        if (!privateMessage.get()) MessageUtil2.sendNormalMessage(message, packet.get());
-        else MessageUtil2.sendPrivateMessage(message, event.name, packet.get());
+        if (!privateMessage.get()) MessageUtil.sendNormalMessage(message, packet.get());
+        else MessageUtil.sendPrivateMessage(message, event.name, packet.get());
 
         announceWait = ezDelay.get();
     }

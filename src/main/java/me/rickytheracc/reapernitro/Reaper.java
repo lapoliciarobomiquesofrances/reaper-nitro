@@ -13,8 +13,6 @@ import me.rickytheracc.reapernitro.modules.external.ExternalHUD;
 import me.rickytheracc.reapernitro.modules.external.ExternalNotifs;
 import me.rickytheracc.reapernitro.util.combat.Statistics;
 import me.rickytheracc.reapernitro.util.misc.MathUtil;
-import me.rickytheracc.reapernitro.util.misc.MessageUtil;
-import me.rickytheracc.reapernitro.util.services.GlobalManager;
 import me.rickytheracc.reapernitro.util.services.NotificationManager;
 import me.rickytheracc.reapernitro.util.services.ResourceLoaderService;
 import meteordevelopment.meteorclient.MeteorClient;
