@@ -1,10 +1,10 @@
 package me.rickytheracc.reaperplus.modules.misc;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import me.rickytheracc.reaperplus.util.player.Interactions;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.*;
@@ -18,7 +18,7 @@ import net.minecraft.util.Hand;
 // credit to Murphy for porting the base module
 
 
-public class OneTap extends ReaperModule {
+public class OneTap extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgAimbot = settings.createGroup("Aimbot");
 

@@ -2,10 +2,10 @@ package me.rickytheracc.reaperplus.modules.misc;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.modules.combat.BedGod;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import me.rickytheracc.reaperplus.util.player.Interactions;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.player.EXPThrower;
 import meteordevelopment.meteorclient.utils.player.Rotations;
@@ -14,7 +14,7 @@ import net.minecraft.item.BowItem;
 import net.minecraft.item.EnderPearlItem;
 import net.minecraft.item.ExperienceBottleItem;
 
-public class AntiAim extends ReaperModule {
+public class AntiAim extends Module {
     private final SettingGroup sgDefault = settings.getDefaultGroup();
 
     private final Setting<Mode> antiDesync = sgDefault.add(new EnumSetting.Builder<Mode>().name("anti-desync").description("Stops spinning on some triggers.").defaultValue(Mode.All).build());

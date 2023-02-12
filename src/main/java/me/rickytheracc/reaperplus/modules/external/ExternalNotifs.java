@@ -1,18 +1,18 @@
 package me.rickytheracc.reaperplus.modules.external;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import me.rickytheracc.reaperplus.util.render.ExternalRenderers;
 import me.rickytheracc.reaperplus.util.services.NotificationManager;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.render.color.RainbowColor;
 import meteordevelopment.orbit.EventHandler;
 
 import java.awt.*;
 import java.util.ArrayList;
 
-public class ExternalNotifs extends ReaperModule {
+public class ExternalNotifs extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Boolean> chroma = sgGeneral.add(new BoolSetting.Builder()

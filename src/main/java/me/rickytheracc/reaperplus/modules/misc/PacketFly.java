@@ -1,7 +1,6 @@
 package me.rickytheracc.reaperplus.modules.misc;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import me.rickytheracc.reaperplus.util.misc.SystemTimer;
 import me.rickytheracc.reaperplus.util.world.BlockHelper;
 import meteordevelopment.meteorclient.events.entity.player.PlayerMoveEvent;
@@ -14,6 +13,7 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.mixin.PlayerPositionLookS2CPacketAccessor;
 import meteordevelopment.meteorclient.mixininterface.IVec3d;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.world.Timer;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
@@ -38,7 +38,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-public class PacketFly extends ReaperModule {
+public class PacketFly extends Module {
     public enum PacketFlyType {
         FACTOR,
         SETBACK,

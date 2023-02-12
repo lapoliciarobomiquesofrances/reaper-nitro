@@ -6,11 +6,11 @@ import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.events.PopEvent;
 import me.rickytheracc.reaperplus.util.combat.Statistics;
 import me.rickytheracc.reaperplus.util.player.StringUtil;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.entity.EntityRemovedEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.friends.Friends;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
@@ -19,7 +19,7 @@ import net.minecraft.util.Formatting;
 
 import java.util.*;
 
-public class PopCounter extends ReaperModule {
+public class PopCounter extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgAnnounce = settings.createGroup("Announce");
 

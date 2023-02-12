@@ -47,7 +47,7 @@ public class TickShift extends Module {
     private final Setting<Double> stepHeight = sgAC.add(new DoubleSetting.Builder().name("step-height").defaultValue(1).min(0.5).sliderRange(0.5, 10).visible(step::get).build());
 
     public TickShift() {
-        super(ReaperPlus.R, "reaper-long-jump", "Manipulate movement packets to travel quickly.");
+        super(ReaperPlus.R, "tick-shift", "Manipulate movement packets to travel quickly.");
     }
 
     private int chargeTicked;

@@ -1,10 +1,9 @@
 package me.rickytheracc.reaperplus.modules.combat;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import me.rickytheracc.reaperplus.util.misc.Formatter;
 import me.rickytheracc.reaperplus.util.misc.MathUtil;
-import me.rickytheracc.reaperplus.util.network.PacketManager;
+import me.rickytheracc.reaperplus.util.world.PacketManager;
 import me.rickytheracc.reaperplus.util.player.Interactions;
 import me.rickytheracc.reaperplus.util.world.BlockHelper;
 import me.rickytheracc.reaperplus.util.world.CombatHelper;
@@ -16,6 +15,7 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.*;
 import meteordevelopment.meteorclient.renderer.text.TextRenderer;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.entity.EntityUtils;
 import meteordevelopment.meteorclient.utils.entity.SortPriority;
 import meteordevelopment.meteorclient.utils.entity.TargetUtils;
@@ -46,7 +46,7 @@ import org.joml.Vector3d;
 
 import java.util.List;
 
-public class BedGod extends ReaperModule {
+public class BedGod extends Module {
 
     public enum RenderMode {
         Single,

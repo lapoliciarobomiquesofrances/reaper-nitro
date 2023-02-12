@@ -2,8 +2,7 @@ package me.rickytheracc.reaperplus.modules.combat;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.util.misc.MathUtil;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
-import me.rickytheracc.reaperplus.util.network.PacketManager;
+import me.rickytheracc.reaperplus.util.world.PacketManager;
 import me.rickytheracc.reaperplus.util.player.Interactions;
 import me.rickytheracc.reaperplus.util.render.Renderers;
 import me.rickytheracc.reaperplus.util.world.BlockHelper;
@@ -14,6 +13,7 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.renderer.text.TextRenderer;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.entity.EntityUtils;
 import meteordevelopment.meteorclient.utils.entity.SortPriority;
 import meteordevelopment.meteorclient.utils.entity.TargetUtils;
@@ -39,7 +39,7 @@ import org.joml.Vector3d;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class AnchorGod extends ReaperModule {
+public class AnchorGod extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgTargeting = settings.createGroup("Targeting");
     private final SettingGroup sgTurbo = settings.createGroup("Turbo");

@@ -25,7 +25,7 @@ public class ModuleHelper {
         Modules.get().get(QuickMend.class),
         Modules.get().get(ReaperSurround.class),
         Modules.get().get(ReaperSelfTrap.class),
-        Modules.get().get(SmartHoleFill.class)
+        Modules.get().get(ReaperHoleFill.class)
     ));
 
     public static void disableMovement(Module parent) {

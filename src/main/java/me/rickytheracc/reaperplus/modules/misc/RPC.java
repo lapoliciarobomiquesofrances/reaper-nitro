@@ -1,7 +1,6 @@
 package me.rickytheracc.reaperplus.modules.misc;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import me.rickytheracc.reaperplus.util.misc.Formatter;
 import me.rickytheracc.reaperplus.util.misc.MathUtil;
 import me.rickytheracc.reaperplus.util.misc.ScreenUtil;
@@ -10,6 +9,7 @@ import meteordevelopment.discordipc.DiscordIPC;
 import meteordevelopment.discordipc.RichPresence;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.misc.DiscordPresence;
 import meteordevelopment.meteorclient.utils.Utils;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class RPC extends ReaperModule {
+public class RPC extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     public enum Logo {Default, Legacy, Letter, Red, Orange, Yellow, Green, Blue, Purple, Pink, White}

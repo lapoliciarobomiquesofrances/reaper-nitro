@@ -1,4 +1,4 @@
-package me.rickytheracc.reaperplus.util.network;
+package me.rickytheracc.reaperplus.util.world;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.util.player.Interactions;
