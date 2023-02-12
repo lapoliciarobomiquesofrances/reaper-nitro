@@ -40,6 +40,311 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 public class AnchorGod extends ReaperModule {
+    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+    private final SettingGroup sgTargeting = settings.createGroup("Targeting");
+    private final SettingGroup sgTurbo = settings.createGroup("Turbo");
+    private final SettingGroup sgAutoRefill = settings.createGroup("AutoRefill");
+    private final SettingGroup sgAntiCheat = settings.createGroup("AntiCheat");
+    private final SettingGroup sgRender = settings.createGroup("Render");
+
+    // General
+
+    private final Setting<Boolean> packetPlace = sgGeneral.add(new BoolSetting.Builder()
+        .name("packet-place")
+        .description("Place the blocks using packets.")
+        .defaultValue(false)
+        .build()
+    );
+
+    public final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
+        .name("rotate")
+        .description("Rotate for block interactions.")
+        .defaultValue(false)
+        .build()
+    );
+
+    public final Setting<Boolean> fastCalc = sgGeneral.add(new BoolSetting.Builder()
+        .name("fast-calc")
+        .description("Makes placement and breaking calculation faster at the cost of accuracy.")
+        .defaultValue(false)
+        .build()
+    );
+
+    public final Setting<Integer> placeDelay = sgGeneral.add(new IntSetting.Builder()
+        .name("place-delay")
+        .description("Ticks between placing anchors.")
+        .defaultValue(9)
+        .sliderRange(0, 20)
+        .build()
+    );
+
+    public final Setting<Integer> breakDelay = sgGeneral.add(new IntSetting.Builder()
+        .name("break-delay")
+        .description("Ticks between exploding anchors.")
+        .defaultValue(9)
+        .sliderRange(0, 20)
+        .build()
+    );
+
+    public final Setting<Boolean> antiSuicide = sgGeneral.add(new BoolSetting.Builder()
+        .name("anti-suicide")
+        .description("Prevents exploding anchors that will kill you.")
+        .defaultValue(true)
+        .build()
+    );
+
+    public final Setting<Boolean> antiDesync = sgGeneral.add(new BoolSetting.Builder()
+        .name("anti-desync")
+        .description("Prevents desynced placements and 'glowstone desync'.")
+        .defaultValue(false)
+        .build()
+    );
+
+    public final Setting<Boolean> debug = sgGeneral.add(new BoolSetting.Builder()
+        .name("debug")
+        .defaultValue(false)
+        .build()
+    );
+
+    // Targeting
+
+    public final Setting<Double> targetRange = sgTargeting.add(new DoubleSetting.Builder()
+        .name("target-range")
+        .defaultValue(7)
+        .sliderRange(1, 30)
+        .build()
+    );
+
+    public final Setting<Integer> xRadius = sgTargeting.add(new IntSetting.Builder()
+        .name("x-radius")
+        .defaultValue(5)
+        .sliderRange(1, 9)
+        .build()
+    );
+
+    public final Setting<Integer> yRadius = sgTargeting.add(new IntSetting.Builder()
+        .name("y-radius")
+        .defaultValue(4)
+        .sliderRange(1, 5)
+        .build()
+    );
+
+    public final Setting<Double> placeRange = sgTargeting.add(new DoubleSetting.Builder()
+        .name("place-range")
+        .defaultValue(4.5)
+        .sliderRange(1, 10)
+        .build()
+    );
+
+    public final Setting<Boolean> flatMode = sgTargeting.add(new BoolSetting.Builder()
+        .name("flat-mode")
+        .description("Only place on the ground.")
+        .defaultValue(false)
+        .build()
+    );
+
+    public final Setting<Double> minTargetDamage = sgTargeting.add(new DoubleSetting.Builder()
+        .name("min-target-damage")
+        .description("The minimum damage to inflict on your target.")
+        .defaultValue(5.2)
+        .range(0, 36)
+        .sliderMax(36)
+        .build()
+    );
+
+    public final Setting<Double> maxSelfDamage = sgTargeting.add(new DoubleSetting.Builder()
+        .name("max-self-damage")
+        .description("The maximum damage to inflict on yourself.")
+        .defaultValue(4)
+        .range(0, 36)
+        .sliderMax(36)
+        .build()
+    );
+
+    public final Setting<Boolean> popOverride = sgTargeting.add(new BoolSetting.Builder()
+        .name("pop-override")
+        .description("Ignore self damage when you can pop the target without popping yourself.")
+        .defaultValue(true)
+        .build()
+    );
+
+    public final Setting<Double> popOverrideHP = sgTargeting.add(new DoubleSetting.Builder()
+        .name("post-hp")
+        .description("How much hp you need after ignoring self damage.")
+        .defaultValue(4.5)
+        .min(0)
+        .sliderMax(36)
+        .build()
+    );
+
+    public final Setting<Boolean> prediction = sgTargeting.add(new BoolSetting.Builder()
+        .name("predict")
+        .description("Predict the players position next tick for calculations.")
+        .defaultValue(false)
+        .build()
+    );
+
+    public final Setting<Integer> predictionTicks = sgTargeting.add(new IntSetting.Builder()
+        .name("predict-ticks")
+        .description("How many ticks ahead to predict.")
+        .defaultValue(3)
+        .sliderRange(1, 5)
+        .visible(prediction::get)
+        .build()
+    );
+
+    // Turbo
+
+    public final Setting<Boolean> turbo = sgTurbo.add(new BoolSetting.Builder()
+        .name("turbo")
+        .description("Increase place/break speed when the target can chain-pop.")
+        .defaultValue(false)
+        .build()
+    );
+
+    public final Setting<Boolean> turboHoleCheck = sgTurbo.add(new BoolSetting.Builder()
+        .name("require-target-hole")
+        .description("Requires the target to be in a hole.")
+        .defaultValue(true)
+        .build()
+    );
+
+    public final Setting<Boolean> turboHoleCheckSelf = sgTurbo.add(new BoolSetting.Builder()
+        .name("require-self-hole")
+        .description("Requires you to be in a hole.")
+        .defaultValue(false)
+        .build()
+    );
+
+    public final Setting<Double> turboHP = sgTurbo.add(new DoubleSetting.Builder()
+        .name("turbo-activation")
+        .description("What health turbo activates at.")
+        .defaultValue(10.5)
+        .min(0)
+        .sliderMax(36)
+        .build()
+    );
+
+    public final Setting<Integer> turboSpeed = sgTurbo.add(new IntSetting.Builder()
+        .name("turbo-speed")
+        .description("How fast anchors are placed and exploded when turbo is active.")
+        .defaultValue(4)
+        .sliderRange(0, 5)
+        .build()
+    );
+
+    // AntiCheat
+
+    public final Setting<Boolean> raytraceSelf = sgAntiCheat.add(new BoolSetting.Builder()
+        .name("raytrace-self")
+        .description("Raytrace anchors to yourself.")
+        .defaultValue(false)
+        .build()
+    );
+
+    public final Setting<Boolean> raytraceTarget = sgAntiCheat.add(new BoolSetting.Builder()
+        .name("raytrace-target")
+        .description("Raytrace anchors to the target.")
+        .defaultValue(false)
+        .build()
+    );
+
+    public final Setting<Boolean> strictRange = sgAntiCheat.add(new BoolSetting.Builder()
+        .name("strict-ranges")
+        .description("Limits place/break range for strict anti cheats.")
+        .defaultValue(false)
+        .build()
+    );
+
+    public final Setting<Boolean> strictMotion = sgAntiCheat.add(new BoolSetting.Builder()
+        .name("strict-motion")
+        .description("Limits some actions while moving for strict anti cheats.")
+        .defaultValue(false)
+        .build()
+    );
+
+    public final Setting<Boolean> strictInv = sgAntiCheat.add(new BoolSetting.Builder()
+        .name("strict-interact")
+        .description("Inhibits inventory interactions for strict anti cheats.")
+        .defaultValue(false)
+        .build()
+    );
+
+    // Auto Refill
+
+    public final Setting<Boolean> autoRefill = sgAutoRefill.add(new BoolSetting.Builder()
+        .name("auto-refill")
+        .description("Automatically move needed material to the hotbar.")
+        .defaultValue(true)
+        .build()
+    );
+
+    public final Setting<Integer> anchorSlot = sgAutoRefill.add(new IntSetting.Builder()
+        .name("anchor-slot")
+        .description("Where to move anchors to.")
+        .defaultValue(7)
+        .range(1,9)
+        .sliderRange(1,9)
+        .visible(autoRefill::get)
+        .build()
+    );
+    public final Setting<Integer> glowstoneSlot = sgAutoRefill.add(new IntSetting.Builder()
+        .name("glowstone-slot")
+        .description("Where to move glowstone to.")
+        .defaultValue(7)
+        .range(1,9)
+        .sliderRange(1,9)
+        .visible(autoRefill::get)
+        .build()
+    );
+
+    // Render
+
+    public final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder()
+        .name("render")
+        .description("Render where the anchor will be placed.")
+        .defaultValue(true)
+        .build()
+    );
+
+    public final Setting<Boolean> renderBreak = sgRender.add(new BoolSetting.Builder()
+        .name("render-break")
+        .description("Render where anchors are broken.")
+        .defaultValue(true)
+        .build()
+    );
+
+    public final Setting<Integer> renderTime = sgRender.add(new IntSetting.Builder()
+        .name("render-time")
+        .description("How long anchor placements are rendered.")
+        .defaultValue(3)
+        .min(1)
+        .sliderMax(10)
+        .visible(render::get)
+        .build()
+    );
+
+    public final Setting<Integer> renderTimeBreak = sgRender.add(new IntSetting.Builder()
+        .name("render-time-break")
+        .description("How long anchor explosions are rendered.")
+        .defaultValue(2)
+        .min(1)
+        .sliderMax(10)
+        .visible(renderBreak::get)
+        .build()
+    );
+
+    public final Setting<Integer> fadeFactor = sgRender.add(new IntSetting.Builder().name("fade-factor").description("How much the place render fades per tick.").defaultValue(8).min(1).sliderMax(100).visible(render::get).build());
+    public final Setting<Integer> fadeFactorBreak = sgRender.add(new IntSetting.Builder().name("fade-factor-break").description("How much the explosion render fades per tick.").defaultValue(8).min(1).sliderMax(100).visible(renderBreak::get).build());
+    public final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>().name("shape-mode").description("How to render the anchor.").defaultValue(ShapeMode.Both).build());
+    public final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder().name("side-color").description("The side color for placements.").defaultValue(new SettingColor(255, 0, 170, 35)).build());
+    public final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder().name("line-color").description("The line color for placements.").defaultValue(new SettingColor(255, 0, 170)).build());
+    public final Setting<SettingColor> sideColorBreak = sgRender.add(new ColorSetting.Builder().name("side-color-break").description("The side color for explosions.").defaultValue(new SettingColor(255, 0, 170, 35)).build());
+    public final Setting<SettingColor> lineColorBreak = sgRender.add(new ColorSetting.Builder().name("line-color-break").description("The line color for explosions.").defaultValue(new SettingColor(255, 0, 170)).build());
+    public final Setting<Boolean> renderDamage = sgRender.add(new BoolSetting.Builder().name("render-damage").description("Render the damage the anchor will do.").defaultValue(true).build());
+    public final Setting<SettingColor> damageColor = sgRender.add(new ColorSetting.Builder().name("damage-color").description("The damage text color.").defaultValue(new SettingColor(15, 255, 211)).build());
+    public final Setting<Double> damageScale = sgRender.add(new DoubleSetting.Builder().name("damage-scale").description("The scale of the damage text.").defaultValue(1.4).min(0).max(5.0).sliderMax(5.0).build());
+
 
     private class AnchorPlacement {
         private BlockPos pos;
@@ -65,71 +370,8 @@ public class AnchorGod extends ReaperModule {
         public BlockHitResult getHitResult() {return this.hitResult;}
     }
 
-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgTargeting = settings.createGroup("Targeting");
-    private final SettingGroup sgTurbo = settings.createGroup("Turbo");
-    private final SettingGroup sgAutoRefill = settings.createGroup("AutoRefill");
-    private final SettingGroup sgAntiCheat = settings.createGroup("AntiCheat");
-    private final SettingGroup sgRender = settings.createGroup("Render");
 
-    // general
-    public final Setting<Boolean> debug = sgGeneral.add(new BoolSetting.Builder().name("debug").defaultValue(false).build());
-    private final Setting<Boolean> packetPlace = sgGeneral.add(new BoolSetting.Builder().name("packet-place").defaultValue(false).build());
-    public final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder().name("rotate").description("Rotate for block interactions.").defaultValue(false).build());
-    public final Setting<Boolean> fastCalc = sgGeneral.add(new BoolSetting.Builder().name("fast-calc").description("Makes placement and breaking calculation faster at the cost of accuracy.").defaultValue(false).build());
-    public final Setting<Integer> placeDelay = sgGeneral.add(new IntSetting.Builder().name("place-delay").description("Ticks between placing anchors.").defaultValue(9).sliderRange(0, 20).build());
-    public final Setting<Integer> breakDelay = sgGeneral.add(new IntSetting.Builder().name("break-delay").description("Ticks between exploding anchors.").defaultValue(9).sliderRange(0, 20).build());
-    public final Setting<Boolean> antiSuicide = sgGeneral.add(new BoolSetting.Builder().name("anti-suicide").description("Prevents exploding anchors that will kill you.").defaultValue(true).build());
-    public final Setting<Boolean> antiDesync = sgGeneral.add(new BoolSetting.Builder().name("anti-desync").description("Prevents desynced placements and 'glowstone desync'.").defaultValue(false).build());
-    public final Setting<Boolean> antiSelfTrap = sgGeneral.add(new BoolSetting.Builder().name("anti-self-trap").description("Automatically mine the target's self trap.").defaultValue(false).build());
 
-    // targeting
-    public final Setting<Double> targetRange = sgTargeting.add(new DoubleSetting.Builder().name("target-range").defaultValue(7).sliderRange(1, 30).build());
-    public final Setting<Integer> xRadius = sgTargeting.add(new IntSetting.Builder().name("x-radius").defaultValue(5).sliderRange(1, 9).build());
-    public final Setting<Integer> yRadius = sgTargeting.add(new IntSetting.Builder().name("y-radius").defaultValue(4).sliderRange(1, 5).build());
-    public final Setting<Double> placeRange = sgTargeting.add(new DoubleSetting.Builder().name("place-range").defaultValue(4.5).sliderRange(1, 10).build());
-    public final Setting<Boolean> flatMode = sgTargeting.add(new BoolSetting.Builder().name("flat-mode").description("Only place on the ground.").defaultValue(false).build());
-    public final Setting<Double> minTargetDamage = sgTargeting.add(new DoubleSetting.Builder().name("min-target-damage").description("The minimum damage to inflict on your target.").defaultValue(5.2).range(0, 36).sliderMax(36).build());
-    public final Setting<Double> maxSelfDamage = sgTargeting.add(new DoubleSetting.Builder().name("max-self-damage").description("The maximum damage to inflict on yourself.").defaultValue(4).range(0, 36).sliderMax(36).build());
-    public final Setting<Boolean> popOverride = sgTargeting.add(new BoolSetting.Builder().name("pop-override").description("Ignore self damage when you can pop the target without popping yourself.").defaultValue(true).build());
-    public final Setting<Double> popOverrideHP = sgTargeting.add(new DoubleSetting.Builder().name("post-hp").description("How much hp you need after ignoring self damage.").defaultValue(4.5).min(0).sliderMax(36).build());
-    public final Setting<Boolean> prediction = sgTargeting.add(new BoolSetting.Builder().name("predict").description("Predict the players position next tick for calculations.").defaultValue(false).build());
-    public final Setting<Integer> predictionTicks = sgTargeting.add(new IntSetting.Builder().name("predict-ticks").description("How many ticks ahead to predict.").defaultValue(3).sliderRange(1, 5).visible(prediction::get).build());
-
-    // turbo
-    public final Setting<Boolean> turbo = sgTurbo.add(new BoolSetting.Builder().name("turbo").description("Increase place/break speed when the target can chain-pop.").defaultValue(false).build());
-    public final Setting<Boolean> turboHoleCheck = sgTurbo.add(new BoolSetting.Builder().name("require-target-hole").description("Requires the target to be in a hole.").defaultValue(true).build());
-    public final Setting<Boolean> turboHoleCheckSelf = sgTurbo.add(new BoolSetting.Builder().name("require-self-hole").description("Requires you to be in a hole.").defaultValue(false).build());
-    public final Setting<Double> turboHP = sgTurbo.add(new DoubleSetting.Builder().name("turbo-activation").description("What health turbo activates at.").defaultValue(10.5).min(0).sliderMax(36).build());
-    public final Setting<Integer> turboSpeed = sgTurbo.add(new IntSetting.Builder().name("turbo-speed").description("How fast anchors are placed and exploded when turbo is active.").defaultValue(4).sliderRange(0, 5).build());
-
-    // anti cheat
-    public final Setting<Boolean> raytraceSelf = sgAntiCheat.add(new BoolSetting.Builder().name("raytrace-self").description("Raytrace anchors to yourself.").defaultValue(false).build());
-    public final Setting<Boolean> raytraceTarget = sgAntiCheat.add(new BoolSetting.Builder().name("raytrace-target").description("Raytrace anchors to the target.").defaultValue(false).build());
-    public final Setting<Boolean> strictRange = sgAntiCheat.add(new BoolSetting.Builder().name("strict-ranges").description("Limits place/break range for strict anti cheats.").defaultValue(false).build());
-    public final Setting<Boolean> strictMotion = sgAntiCheat.add(new BoolSetting.Builder().name("strict-motion").description("Limits some actions while moving for strict anti cheats.").defaultValue(false).build());
-    public final Setting<Boolean> strictInv = sgAntiCheat.add(new BoolSetting.Builder().name("strict-interact").description("Inhibits inventory interactions for strict anti cheats.").defaultValue(false).build());
-
-    // auto refill
-    public final Setting<Boolean> autoRefill = sgAutoRefill.add(new BoolSetting.Builder().name("auto-refill").description("Automatically move needed material to the hotbar.").defaultValue(true).build());
-    public final Setting<Integer> anchorSlot = sgAutoRefill.add(new IntSetting.Builder().name("anchor-slot").description("Where to move anchors to.").defaultValue(7).min(1).max(9).sliderMin(1).sliderMax(9).visible(autoRefill::get).build());
-    public final Setting<Integer> glowstoneSlot = sgAutoRefill.add(new IntSetting.Builder().name("glowstone-slot").description("Where to move glowstone to.").defaultValue(7).min(1).max(9).sliderMin(1).sliderMax(9).visible(autoRefill::get).build());
-
-    // render
-    public final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder().name("render").description("Render where the anchor will be placed.").defaultValue(true).build());
-    public final Setting<Boolean> renderBreak = sgRender.add(new BoolSetting.Builder().name("render-break").description("Render where anchors are broken.").defaultValue(true).build());
-    public final Setting<Integer> renderTime = sgRender.add(new IntSetting.Builder().name("render-time").description("How long anchor placements are rendered.").defaultValue(3).min(1).sliderMax(10).visible(render::get).build());
-    public final Setting<Integer> renderTimeBreak = sgRender.add(new IntSetting.Builder().name("render-time-break").description("How long anchor explosions are rendered.").defaultValue(2).min(1).sliderMax(10).visible(renderBreak::get).build());
-    public final Setting<Integer> fadeFactor = sgRender.add(new IntSetting.Builder().name("fade-factor").description("How much the place render fades per tick.").defaultValue(8).min(1).sliderMax(100).visible(render::get).build());
-    public final Setting<Integer> fadeFactorBreak = sgRender.add(new IntSetting.Builder().name("fade-factor-break").description("How much the explosion render fades per tick.").defaultValue(8).min(1).sliderMax(100).visible(renderBreak::get).build());
-    public final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>().name("shape-mode").description("How to render the anchor.").defaultValue(ShapeMode.Both).build());
-    public final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder().name("side-color").description("The side color for placements.").defaultValue(new SettingColor(255, 0, 170, 35)).build());
-    public final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder().name("line-color").description("The line color for placements.").defaultValue(new SettingColor(255, 0, 170)).build());
-    public final Setting<SettingColor> sideColorBreak = sgRender.add(new ColorSetting.Builder().name("side-color-break").description("The side color for explosions.").defaultValue(new SettingColor(255, 0, 170, 35)).build());
-    public final Setting<SettingColor> lineColorBreak = sgRender.add(new ColorSetting.Builder().name("line-color-break").description("The line color for explosions.").defaultValue(new SettingColor(255, 0, 170)).build());
-    public final Setting<Boolean> renderDamage = sgRender.add(new BoolSetting.Builder().name("render-damage").description("Render the damage the anchor will do.").defaultValue(true).build());
-    public final Setting<SettingColor> damageColor = sgRender.add(new ColorSetting.Builder().name("damage-color").description("The damage text color.").defaultValue(new SettingColor(15, 255, 211)).build());
-    public final Setting<Double> damageScale = sgRender.add(new DoubleSetting.Builder().name("damage-scale").description("The scale of the damage text.").defaultValue(1.4).min(0).max(5.0).sliderMax(5.0).build());
 
 
     private PlayerEntity target;

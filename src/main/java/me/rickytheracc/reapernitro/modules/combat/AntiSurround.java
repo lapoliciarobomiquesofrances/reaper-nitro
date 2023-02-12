@@ -34,12 +34,9 @@ public class AntiSurround extends ReaperModule {
     private final SettingGroup sgRender = settings.createGroup("Render");
     private final SettingGroup sgNone = settings.createGroup("");
 
-    //private final Setting<Notifications.Mode> notifications = sgNone.add(new EnumSetting.Builder<Notifications.Mode>().name("notifications").defaultValue(Notifications.Mode.Toast).build());
-
     private final Setting<Mode> breakMode = sgGeneral.add(new EnumSetting.Builder<Mode>().name("break-mode").description("The way to break the blocks.").defaultValue(Mode.Client).build());
     private final Setting<Integer> targetRange = sgGeneral.add(new IntSetting.Builder().name("target-range").description("The range players can be targeted.").defaultValue(5).sliderRange(0, 7).build());
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder().name("rotate").description("Automatically faces towards the blocks being placed.").defaultValue(false).build());
-    //private final Setting<Boolean> keepBreaking = sgGeneral.add(new BoolSetting.Builder().name("keep-breaking").defaultValue(false).build());
 
     private final Setting<Boolean> rightClickEat = sgMisc.add(new BoolSetting.Builder().name("right-click-eat").description("Stops breaking the block and starts eating EGapple.").defaultValue(false).build());
     private final Setting<Boolean> cancelEat = sgMisc.add(new BoolSetting.Builder().name("cancel-eat").description("Press right button again to stop eating.").defaultValue(true).visible(rightClickEat::get).build());

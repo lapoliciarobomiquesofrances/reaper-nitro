@@ -16,7 +16,7 @@ public class ModuleHelper {
        Modules.get().get(Speed.class),
        Modules.get().get(Step.class),
        Modules.get().get(LongJump.class),
-       Modules.get().get(ReaperLongJump.class)
+       Modules.get().get(TickShift.class)
     ));
 
     public static List<Module> combatModules = new ArrayList<>(Arrays.asList(
@@ -25,7 +25,7 @@ public class ModuleHelper {
         Modules.get().get(BedGod.class),
         Modules.get().get(QuickMend.class),
         Modules.get().get(ReaperSurround.class),
-        Modules.get().get(SelfTrapPlus.class),
+        Modules.get().get(ReaperSelfTrap.class),
         Modules.get().get(SmartHoleFill.class)
     ));
 

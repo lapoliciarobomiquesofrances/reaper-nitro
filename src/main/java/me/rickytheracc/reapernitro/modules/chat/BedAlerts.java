@@ -1,7 +1,7 @@
 package me.rickytheracc.reapernitro.modules.chat;
 
 import me.rickytheracc.reapernitro.Reaper;
-import me.rickytheracc.reapernitro.modules.combat.SelfTrapPlus;
+import me.rickytheracc.reapernitro.modules.combat.ReaperSelfTrap;
 import me.rickytheracc.reapernitro.util.misc.ReaperModule;
 import me.rickytheracc.reapernitro.util.player.Interactions;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -109,8 +109,8 @@ public class BedAlerts extends ReaperModule {
 
         for (PlayerEntity player : bedFags) {
             if (player.squaredDistanceTo(mc.player) <= smartRange.get() * smartRange.get()) {
-                SelfTrapPlus selfTrapPlus = Modules.get().get(SelfTrapPlus.class);
-                if (!selfTrapPlus.isActive()) selfTrapPlus.toggle();
+                ReaperSelfTrap reaperSelfTrap = Modules.get().get(ReaperSelfTrap.class);
+                if (!reaperSelfTrap.isActive()) reaperSelfTrap.toggle();
                 break;
             }
         }

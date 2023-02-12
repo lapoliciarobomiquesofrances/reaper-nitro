@@ -5,6 +5,7 @@ import me.rickytheracc.reapernitro.modules.combat.*;
 import me.rickytheracc.reapernitro.modules.hud.CustomImage;
 import me.rickytheracc.reapernitro.modules.hud.Notifications;
 import me.rickytheracc.reapernitro.modules.hud.SpotifyHud;
+import me.rickytheracc.reapernitro.modules.hud.TextPresets;
 import me.rickytheracc.reapernitro.modules.misc.*;
 import me.rickytheracc.reapernitro.modules.misc.elytrabot.ElytraBotThreaded;
 import me.rickytheracc.reapernitro.modules.external.ExternalFeed;
@@ -55,12 +56,12 @@ public class Reaper extends MeteorAddon {
         log("Loading Reaper " + VERSION);
         System.setProperty("java.awt.headless", "false");
 
-//        // Make sure directories exist
-//        log("Creating folders...");
-//        if (!FOLDER.exists()) FOLDER.mkdirs();
-//        if (!RECORDINGS.exists()) RECORDINGS.mkdirs();
-//        if (!ASSETS.exists()) ASSETS.mkdirs();
-//        if (!USER_ASSETS.exists()) USER_ASSETS.mkdirs();
+        // Make sure directories exist
+        log("Creating folders...");
+        if (!FOLDER.exists()) FOLDER.mkdirs();
+        if (!RECORDINGS.exists()) RECORDINGS.mkdirs();
+        if (!ASSETS.exists()) ASSETS.mkdirs();
+        if (!USER_ASSETS.exists()) USER_ASSETS.mkdirs();
 
         // Init services
         log("Creating threads...");
@@ -80,7 +81,8 @@ public class Reaper extends MeteorAddon {
             .set("kdr", Statistics::getKDR)
             .set("killstreak", Statistics::getStreak)
             .set("highscore", Statistics::getHighSore)
-            .set("timeplayed", Statistics::getTimeOnline)
+            .set("timeplayed", Statistics::getPlaytime)
+            .set("crystalsps", Statistics::getCrystalsPs)
         );
 
         // Load Modules
@@ -90,10 +92,10 @@ public class Reaper extends MeteorAddon {
         modules.add(new AnchorGod());
         modules.add(new AntiSurround());
         modules.add(new BedGod());
-        modules.add(new ReaperLongJump());
+        modules.add(new TickShift());
         modules.add(new QuickMend());
         modules.add(new ReaperSurround());
-        modules.add(new SelfTrapPlus());
+        modules.add(new ReaperSelfTrap());
         modules.add(new SmartHoleFill());
 
         modules.add(new ArmorAlert());
@@ -124,15 +126,15 @@ public class Reaper extends MeteorAddon {
         hud.register(CustomImage.INFO);
         hud.register(Notifications.INFO);
         hud.register(SpotifyHud.INFO);
+        hud.register(TextPresets.INFO);
 
         log("Reaper loaded in " + (System.currentTimeMillis() - start) + "ms!");
 
-//        Runtime.getRuntime().addShutdownHook(new Thread(() ->{
-//            Reaper.modules.shutdownNow();
-//            cached.shutdownNow();
-//            scheduled.shutdownNow();
-//        }));
-
+        Runtime.getRuntime().addShutdownHook(new Thread(() ->{
+            Reaper.modules.shutdownNow();
+            cached.shutdownNow();
+            scheduled.shutdownNow();
+        }));
     }
 
     @Override

@@ -29,27 +29,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SelfTrapPlus extends ReaperModule {
-
-    public enum PlaceMode {
-        AntiFacePlace,
-        Full,
-        Top,
-        None
-    }
-
-    public enum Mode {
-        Normal,
-        Smart
-    }
-
-
+public class ReaperSelfTrap extends ReaperModule {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgRender = settings.createGroup("Render");
 
     // General
 
-    private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>().name("mode").description("Which mode to use.").defaultValue(Mode.Normal).build());
+    private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
+        .name("mode")
+        .description("Which mode to use.")
+        .defaultValue(Mode.Normal)
+        .build()
+    );
+
     private final Setting<Boolean> packetPlace = sgGeneral.add(new BoolSetting.Builder().name("packet-place").defaultValue(false).build());
     private final Setting<Boolean> smartBeds = sgGeneral.add(new BoolSetting.Builder().name("consider-beds").description("Fully trap yourself if a player has beds nearby.").defaultValue(true).build());
     public final Setting<Double> smartRangeBeds = sgGeneral.add(new DoubleSetting.Builder().name("bed-check-range").description("How far to check for players holding beds.").defaultValue(5).min(0).sliderMax(5).build());
@@ -77,7 +69,7 @@ public class SelfTrapPlus extends ReaperModule {
     private int bpt;
 
 
-    public SelfTrapPlus(){
+    public ReaperSelfTrap(){
         super(Reaper.R, "self-trap-plus", "Places obsidian around your head.");
     }
 
@@ -171,5 +163,18 @@ public class SelfTrapPlus extends ReaperModule {
     private void onRender(Render3DEvent event) {
         if (!render.get() || isDone) return;
         for (BlockPos bb : getPlacePositions()) if (BlockHelper.isAir(bb)) event.renderer.box(bb, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
+    }
+
+
+    public enum PlaceMode {
+        AntiFacePlace,
+        Full,
+        Top,
+        None
+    }
+
+    public enum Mode {
+        Normal,
+        Smart
     }
 }

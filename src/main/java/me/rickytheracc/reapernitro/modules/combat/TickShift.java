@@ -18,8 +18,7 @@ import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
 
-public class ReaperLongJump extends Module {
-
+public class TickShift extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgDelay = settings.createGroup("Delay");
     private final SettingGroup sgAC = settings.createGroup("Anti Cheat");
@@ -47,7 +46,7 @@ public class ReaperLongJump extends Module {
     private final Setting<Boolean> step = sgAC.add(new BoolSetting.Builder().name("allow-step").defaultValue(false).build());
     private final Setting<Double> stepHeight = sgAC.add(new DoubleSetting.Builder().name("step-height").defaultValue(1).min(0.5).sliderRange(0.5, 10).visible(step::get).build());
 
-    public ReaperLongJump() {
+    public TickShift() {
         super(Reaper.R, "reaper-long-jump", "Manipulate movement packets to travel quickly.");
     }
 

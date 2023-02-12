@@ -16,7 +16,6 @@ import net.minecraft.text.TextColor;
 public class ChatTweaks extends ReaperModule {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgPrefix = settings.createGroup("Prefix");
-//    private final SettingGroup sgPlaceHolders = settings.createGroup("Placeholders");
 
     // General
 

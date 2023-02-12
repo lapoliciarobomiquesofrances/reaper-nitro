@@ -93,7 +93,6 @@ public class DamageCalculator {
         public BlockHitResult getHitResult() {return this.hitResult;}
     }
 
-
     public static BlockPos getBreakPos(PlayerEntity target, double range, double maxDmg, boolean antiSuicide) {
         if (target == null) return null;
         double currentHP = PlayerUtils.getTotalHealth();

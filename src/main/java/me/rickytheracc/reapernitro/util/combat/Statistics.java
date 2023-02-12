@@ -16,15 +16,19 @@ import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.combat.*;
 import meteordevelopment.meteorclient.utils.PostInit;
 import meteordevelopment.meteorclient.utils.Utils;
+import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.starscript.value.Value;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.*;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
@@ -54,6 +58,10 @@ public class Statistics {
     public static int highscore = 0;
     private static long startTime;
 
+    private static int ticksPassed;
+    public static int crystalsPerSec;
+    public static int first;
+
     @PostInit
     public static void init() {
         MeteorClient.EVENT_BUS.subscribe(Statistics.class);
@@ -66,6 +74,7 @@ public class Statistics {
         deaths = 0;
         killStreak = 0;
         highscore = 0;
+        ticksPassed = 0;
 
         totemPops.clear();
         playerDeaths.clear();
@@ -83,7 +92,7 @@ public class Statistics {
         return totemPops.getOrDefault(player.getUuid(), 0);
     }
 
-    public static Value getTimeOnline() {
+    public static Value getPlaytime() {
         return Value.string(DurationFormatUtils.formatDuration(
             System.currentTimeMillis() - startTime, "HH:mm:ss")
         );
@@ -107,10 +116,16 @@ public class Statistics {
         if (deaths < 2) kdr = kills + ".00";
         else {
             double kd = (double) kills / deaths;
-            kdr = String.format("%.2f", kd);
+            DecimalFormat df = new DecimalFormat("#.##");
+            df.setRoundingMode(RoundingMode.CEILING);
+            kdr =  df.format(kd);
         }
 
         return Value.string(kdr);
+    }
+
+    public static Value getCrystalsPs() {
+        return Value.number(crystalsPerSec);
     }
 
     public int getPlayerDeaths(PlayerEntity player) {
@@ -121,6 +136,8 @@ public class Statistics {
 
     @EventHandler
     public static void onTick(TickEvent.Post event) {
+        if (!Utils.canUpdate()) return;
+
         if (!mc.isInSingleplayer() && mc.getNetworkHandler() != null) {
             Collection<PlayerListEntry> currentList1 = mc.getNetworkHandler().getPlayerList();
             currentList1.removeAll(prevPlayerList);
@@ -133,6 +150,17 @@ public class Statistics {
             prevPlayerList.clear();
             prevPlayerList.addAll(currentList2);
         }
+
+        if (ticksPassed < 21) ticksPassed++;
+        else ticksPassed = 0;
+
+        if (ticksPassed == 1) first = InvUtils.find(Items.END_CRYSTAL).count();
+
+        if (ticksPassed == 21) {
+            int second = InvUtils.find(Items.END_CRYSTAL).count();
+            int difference = -(second - first);
+            crystalsPerSec = Math.max(0, difference);
+        }
     }
 
     @EventHandler
@@ -144,7 +172,6 @@ public class Statistics {
             if (packet.getStatus() == 3) {
                 boolean wasTarget = targetCheck(player);
                 String name = player.getEntityName();
-
 
                 if (player == mc.player) {
                     deaths++;
