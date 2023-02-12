@@ -7,7 +7,6 @@ import me.rickytheracc.reaperplus.enums.SwingMode;
 import me.rickytheracc.reaperplus.enums.SwitchMode;
 import me.rickytheracc.reaperplus.mixininterface.IVec3d;
 import me.rickytheracc.reaperplus.util.combat.Ranges;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import me.rickytheracc.reaperplus.util.player.Interactions;
 import me.rickytheracc.reaperplus.util.player.PlayerUtil;
 import me.rickytheracc.reaperplus.util.world.BlockUtil;
@@ -18,6 +17,7 @@ import meteordevelopment.meteorclient.mixininterface.IBox;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.friends.Friends;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class SmartHoleFill extends ReaperModule {
+public class ReaperHoleFill extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgTargeting = settings.createGroup("Targeting");
     private final SettingGroup sgRange = settings.createGroup("Ranges");
@@ -259,8 +259,8 @@ public class SmartHoleFill extends ReaperModule {
         .build()
     );
 
-    public SmartHoleFill() {
-        super(ReaperPlus.R, "smart-holefill", "The best way to make your enemies really, REALLY mad.");
+    public ReaperHoleFill() {
+        super(ReaperPlus.R, "reaper-holefill", "The best way to make your enemies really, REALLY mad.");
     }
 
     List<PlayerEntity> targets = new ArrayList<>();

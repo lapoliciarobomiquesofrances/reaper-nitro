@@ -1,13 +1,13 @@
 package me.rickytheracc.reaperplus.modules.combat;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import me.rickytheracc.reaperplus.util.player.Interactions;
 import me.rickytheracc.reaperplus.util.world.BlockHelper;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ReaperSelfTrap extends ReaperModule {
+public class ReaperSelfTrap extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgRender = settings.createGroup("Render");
 

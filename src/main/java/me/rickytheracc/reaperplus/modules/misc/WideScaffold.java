@@ -1,13 +1,13 @@
 package me.rickytheracc.reaperplus.modules.misc;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import me.rickytheracc.reaperplus.util.world.BlockHelper;
 import me.rickytheracc.reaperplus.util.render.Renderers;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
@@ -22,7 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class WideScaffold extends ReaperModule {
+public class WideScaffold extends Module {
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgRender = settings.createGroup("Render");

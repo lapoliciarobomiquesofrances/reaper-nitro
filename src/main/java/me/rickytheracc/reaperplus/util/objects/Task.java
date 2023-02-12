@@ -1,4 +1,4 @@
-package me.rickytheracc.reaperplus.util.misc;
+package me.rickytheracc.reaperplus.util.objects;
 
 public class Task {
     private boolean called;

@@ -1,6 +1,6 @@
 package me.rickytheracc.reaperplus.util.player;
 
-import me.rickytheracc.reaperplus.util.network.PacketManager;
+import me.rickytheracc.reaperplus.util.world.PacketManager;
 import me.rickytheracc.reaperplus.util.world.BlockHelper;
 import me.rickytheracc.reaperplus.util.world.CombatHelper;
 import meteordevelopment.meteorclient.utils.misc.Names;

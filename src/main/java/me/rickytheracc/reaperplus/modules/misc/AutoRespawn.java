@@ -3,9 +3,9 @@ package me.rickytheracc.reaperplus.modules.misc;
 import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.util.combat.Statistics;
 import me.rickytheracc.reaperplus.util.player.StringUtil;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.DeathScreen;
 
@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class AutoRespawn extends ReaperModule {
+public class AutoRespawn extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     // General

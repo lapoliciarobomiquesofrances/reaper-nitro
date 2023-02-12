@@ -2,11 +2,11 @@ package me.rickytheracc.reaperplus.modules.misc;
 
 
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.render.RenderUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
@@ -15,7 +15,7 @@ import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.Vec3d;
 
-public class ChorusPredict extends ReaperModule {
+public class ChorusPredict extends Module {
     private final SettingGroup sgGeneral = settings.createGroup("Render");
 
     public final Setting<Boolean> confirm = sgGeneral.add(new BoolSetting.Builder().name("debug").defaultValue(false).build());

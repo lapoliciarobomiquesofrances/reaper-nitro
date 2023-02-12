@@ -4,15 +4,15 @@ import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.events.DeathEvent;
 import me.rickytheracc.reaperplus.util.combat.Statistics;
 import me.rickytheracc.reaperplus.util.player.StringUtil;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 
 import java.util.List;
 import java.util.Random;
 
-public class AutoEZ extends ReaperModule {
+public class AutoEZ extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     // General

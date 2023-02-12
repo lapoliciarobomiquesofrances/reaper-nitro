@@ -2,15 +2,14 @@ package me.rickytheracc.reaperplus.modules.external;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.util.combat.Statistics;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import me.rickytheracc.reaperplus.util.misc.Formatter;
-import me.rickytheracc.reaperplus.util.misc.Sorter;
 import me.rickytheracc.reaperplus.util.render.ExternalRenderers;
 import me.rickytheracc.reaperplus.util.services.SpotifyService;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.mixin.MinecraftClientAccessor;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.friends.Friends;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.render.Freecam;
 import meteordevelopment.meteorclient.utils.Utils;
@@ -30,10 +29,11 @@ import org.apache.commons.lang3.StringUtils;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ExternalHUD extends ReaperModule {
+public class ExternalHUD extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgCoords = settings.createGroup("Coordinates");
     private final SettingGroup sgModules = settings.createGroup("Modules");
@@ -99,11 +99,11 @@ public class ExternalHUD extends ReaperModule {
     private final Setting<Boolean> highscore = sgCoords.add(new BoolSetting.Builder().name("highscore").defaultValue(false).build());
 
     private final Setting<Boolean> modules = sgModules.add(new BoolSetting.Builder().name("modules").defaultValue(false).build());
-    private final Setting<Sorter.SortMode> moduleSortMode = sgModules.add(new EnumSetting.Builder<Sorter.SortMode>().name("module-sort-mode").defaultValue(Sorter.SortMode.Shortest).build());
+    private final Setting<SortMode> moduleSortMode = sgModules.add(new EnumSetting.Builder<SortMode>().name("module-sort-mode").defaultValue(SortMode.Shortest).build());
 
     private final Setting<Boolean> playerList = sgPlayers.add(new BoolSetting.Builder().name("player-list").defaultValue(false).build());
     private final Setting<Boolean> playerListShowDistance = sgPlayers.add(new BoolSetting.Builder().name("show-distance").defaultValue(false).build());
-    private final Setting<Sorter.SortMode> playerListSortMode = sgPlayers.add(new EnumSetting.Builder<Sorter.SortMode>().name("player-sort-mode").defaultValue(Sorter.SortMode.Shortest).build());
+    private final Setting<SortMode> playerListSortMode = sgPlayers.add(new EnumSetting.Builder<SortMode>().name("player-sort-mode").defaultValue(SortMode.Shortest).build());
 
     private final Setting<Boolean> showSpotify = sgSpotify.add(new BoolSetting.Builder().name("spotify").defaultValue(false).build());
     private final Setting<Boolean> spotifySingleLine = sgSpotify.add(new BoolSetting.Builder().name("single-line").defaultValue(false).build());
@@ -243,7 +243,7 @@ public class ExternalHUD extends ReaperModule {
         });
         moduleList.add("");
         moduleList.add("[Modules]");
-        moduleList.addAll(Sorter.sort(ml, moduleSortMode.get()));
+        moduleList.addAll(sort(ml, moduleSortMode.get()));
         return moduleList;
     }
 
@@ -269,8 +269,23 @@ public class ExternalHUD extends ReaperModule {
             ArrayList<String> l = new ArrayList<>();
             l.add("");
             l.add("[Players]");
-            l.addAll(Sorter.sort(playerList, playerListSortMode.get()));
+            l.addAll(sort(playerList, playerListSortMode.get()));
             return l;
         }
+    }
+
+    public static ArrayList<String> sort(ArrayList<String> list, SortMode sortMode) {
+        if (sortMode.equals(SortMode.Shortest)) {
+            list.sort(Comparator.comparing(String::length));
+        } else {
+            list.sort(Comparator.comparing(String::length).reversed());
+        }
+        return list;
+    }
+
+
+    public enum SortMode {
+        Longest,
+        Shortest
     }
 }

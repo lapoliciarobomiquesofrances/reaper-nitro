@@ -1,8 +1,7 @@
 package me.rickytheracc.reaperplus.modules.combat;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
-import me.rickytheracc.reaperplus.util.network.PacketManager;
+import me.rickytheracc.reaperplus.util.world.PacketManager;
 import me.rickytheracc.reaperplus.util.player.Interactions;
 import me.rickytheracc.reaperplus.util.world.BlockHelper;
 import me.rickytheracc.reaperplus.util.world.CombatHelper;
@@ -12,6 +11,7 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.mixin.WorldRendererAccessor;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class ReaperSurround extends ReaperModule {
+public class ReaperSurround extends Module {
 
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();

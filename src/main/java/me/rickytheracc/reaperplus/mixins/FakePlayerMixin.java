@@ -1,7 +1,7 @@
 package me.rickytheracc.reaperplus.mixins;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.AnglePos;
+import me.rickytheracc.reaperplus.util.objects.AnglePos;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.gui.GuiTheme;
 import meteordevelopment.meteorclient.gui.widgets.WWidget;

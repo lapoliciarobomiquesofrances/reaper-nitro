@@ -1,6 +1,7 @@
 package me.rickytheracc.reaperplus.util.combat;
 
 import me.rickytheracc.reaperplus.enums.SwingMode;
+import me.rickytheracc.reaperplus.enums.SwitchMode;
 import me.rickytheracc.reaperplus.util.player.PlayerUtil;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.game.GameJoinedEvent;
@@ -33,40 +34,41 @@ public class Placing {
 
     // Placing blocks
 
-    public static boolean place (
-        BlockPos pos, FindItemResult result,
-        SwingMode swingMode, boolean rotate,
-        int priority, boolean oneTwelve,
-        boolean checkEntities, boolean inventory
-    ) {
-        if (pendingBlocks.containsKey(pos) || !result.found()) return false;
-        if (!canPlace(pos, oneTwelve)) return false;
-
-        Hand hand = result.isOffhand() ? Hand.OFF_HAND : Hand.MAIN_HAND;
-        int slot = result.slot();
-        if (hand != Hand.OFF_HAND && !inventory) {
-            if (slot > 8) return false;
-            if (slot < 0) return false;
-        }
-
-        if (checkEntities) {
-            ItemStack stack = mc.player.getInventory().getStack(slot);
-            BlockState state = Block.getBlockFromItem(stack.getItem()).getDefaultState();
-            if (!mc.world.canPlace(state, pos, ShapeContext.absent())) return false;
-        }
-
-        // Create the BlockHitResult
-        BlockHitResult hitResult = null;
-
-        // Switch to the slot
-
-        placeBlock(hitResult, hand, swingMode, rotate, priority);
-        Statistics.addPlacement(hitResult.getBlockPos());
-
-        // Switch back to the selected slot
-
-        return true;
-    }
+//    public static boolean place (
+//        BlockPos pos, FindItemResult result,
+//        SwingMode swingMode, SwitchMode switchMode,
+//        boolean rotate, int priority,
+//        boolean oneTwelve, boolean checkEntities
+//    ) {
+//        if (!canPlace(pos, oneTwelve) || !result.found()) return false;
+//
+//        if (checkEntities) {
+//            ItemStack stack = mc.player.getInventory().getStack(result.slot());
+//            BlockState state = Block.getBlockFromItem(stack.getItem()).getDefaultState();
+//            if (!mc.world.canPlace(state, pos, ShapeContext.absent())) return false;
+//        }
+//
+//        Hand hand = result.isOffhand() ? Hand.OFF_HAND : Hand.MAIN_HAND;
+//        int slot = result.slot();
+//        if (hand != Hand.OFF_HAND && !inventory) {
+//            if (slot > 8) return false;
+//            if (slot < 0) return false;
+//        }
+//
+//
+//
+//        // Create the BlockHitResult
+//        BlockHitResult hitResult = null;
+//
+//        // Switch to the slot
+//
+//        placeBlock(hitResult, hand, swingMode, rotate, priority);
+//        Statistics.addPlacement(hitResult.getBlockPos());
+//
+//        // Switch back to the selected slot
+//
+//        return true;
+//    }
 
     private static boolean canPlace(BlockPos pos, boolean oneTwelve) {
         if (Statistics.pendingBlocks.containsKey(pos)) return false;

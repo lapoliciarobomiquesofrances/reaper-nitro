@@ -2,7 +2,6 @@ package me.rickytheracc.reaperplus.modules.misc.elytrabot;
 
 import baritone.api.BaritoneAPI;
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import me.rickytheracc.reaperplus.modules.misc.elytrabot.utils.*;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.entity.player.PlayerMoveEvent;
@@ -10,6 +9,7 @@ import meteordevelopment.meteorclient.events.game.GameLeftEvent;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.movement.NoFall;
 import meteordevelopment.meteorclient.systems.modules.player.AutoEat;
@@ -38,7 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class ElytraBotThreaded extends ReaperModule {
+public class ElytraBotThreaded extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     public final SettingGroup sgElytraFly = settings.createGroup("ElytraFly");
     private final SettingGroup sgCoordinates = settings.createGroup("Coordinates");

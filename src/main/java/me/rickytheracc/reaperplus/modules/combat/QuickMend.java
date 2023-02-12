@@ -1,32 +1,90 @@
 package me.rickytheracc.reaperplus.modules.combat;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import me.rickytheracc.reaperplus.util.misc.ModuleHelper;
-import me.rickytheracc.reaperplus.util.network.PacketManager;
+import me.rickytheracc.reaperplus.util.world.PacketManager;
 import me.rickytheracc.reaperplus.util.player.Interactions;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.player.Rotations;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Items;
 
-public class QuickMend extends ReaperModule {
+public class QuickMend extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgPause = settings.createGroup("Pause");
 
-    public final Setting<Double> enableAt = sgGeneral.add(new DoubleSetting.Builder().name("threshold").description("What durability to enable at.").defaultValue(20).min(1).sliderMin(1).sliderMax(100).max(100).build());
-    private final Setting<Double> minHealth = sgGeneral.add(new DoubleSetting.Builder().name("min-health").description("Min health for repairing.").defaultValue(10).min(0).sliderMax(36).max(36).build());
-    private final Setting<Boolean> moduleControl = sgGeneral.add(new BoolSetting.Builder().name("module-control").defaultValue(true).build());
-    private final Setting<Boolean> onlyInHole = sgGeneral.add(new BoolSetting.Builder().name("require-hole").defaultValue(false).build());
-    private final Setting<Boolean> silent = sgGeneral.add(new BoolSetting.Builder().name("silent").defaultValue(false).build());
-    private final Setting<Boolean> refill = sgGeneral.add(new BoolSetting.Builder().name("refill").defaultValue(false).build());
-    private final Setting<Integer> refillSlot = sgGeneral.add(new IntSetting.Builder().name("refill-slot").defaultValue(1).min(1).sliderMin(1).max(9).sliderMax(9).visible(refill::get).build());
-    private final Setting<Boolean> lookDown = sgGeneral.add(new BoolSetting.Builder().name("look-down").defaultValue(true).build());
+    // General
 
-    private final Setting<Boolean> pauseOnGap = sgPause.add(new BoolSetting.Builder().name("pause-on-gap").description("Pauses while holding egaps.").defaultValue(true).build());
+    public final Setting<Double> enableAt = sgGeneral.add(new DoubleSetting.Builder()
+        .name("threshold")
+        .description("What durability to enable at.")
+        .defaultValue(20)
+        .range(1,100)
+        .sliderRange(1,100)
+        .build()
+    );
+
+    private final Setting<Double> minHealth = sgGeneral.add(new DoubleSetting.Builder()
+        .name("min-health")
+        .description("Min health for repairing.")
+        .defaultValue(10)
+        .range(0,36)
+        .sliderRange(0,36)
+        .build()
+    );
+
+    private final Setting<Boolean> moduleControl = sgGeneral.add(new BoolSetting.Builder()
+        .name("module-control")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> onlyInHole = sgGeneral.add(new BoolSetting.Builder()
+        .name("require-hole")
+        .defaultValue(false)
+        .build()
+    );
+
+    private final Setting<Boolean> silent = sgGeneral.add(new BoolSetting.Builder()
+        .name("silent")
+        .defaultValue(false)
+        .build()
+    );
+
+    private final Setting<Boolean> refill = sgGeneral.add(new BoolSetting.Builder()
+        .name("refill")
+        .defaultValue(false)
+        .build()
+    );
+
+    private final Setting<Integer> refillSlot = sgGeneral.add(new IntSetting.Builder()
+        .name("refill-slot")
+        .defaultValue(1)
+        .min(1)
+        .sliderMin(1)
+        .max(9)
+        .sliderMax(9)
+        .visible(refill::get)
+        .build()
+    );
+
+    private final Setting<Boolean> lookDown = sgGeneral.add(new BoolSetting.Builder()
+        .name("look-down")
+        .defaultValue(true)
+        .build()
+    );
+
+
+    private final Setting<Boolean> pauseOnGap = sgPause.add(new BoolSetting.Builder().name("pause-on-gap")
+        .description("Pauses while holding egaps.")
+        .defaultValue(true)
+        .build()
+    );
+
     private final Setting<Boolean> pauseOnEat = sgPause.add(new BoolSetting.Builder().name("pause-on-eat").description("Pauses while eating.").defaultValue(true).build());
     private final Setting<Boolean> pauseOnDrink = sgPause.add(new BoolSetting.Builder().name("pause-on-drink").description("Pauses while drinking.").defaultValue(true).build());
     private final Setting<Boolean> pauseOnMine = sgPause.add(new BoolSetting.Builder().name("pause-on-mine").description("Pauses while mining.").defaultValue(true).build());

@@ -1,18 +1,18 @@
 package me.rickytheracc.reaperplus.modules.misc;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.entity.player.BreakBlockEvent;
 import meteordevelopment.meteorclient.events.entity.player.InteractBlockEvent;
 import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
-public class NoDesync extends ReaperModule {
+public class NoDesync extends Module {
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 

@@ -37,7 +37,6 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -53,7 +52,7 @@ public class Statistics {
     public static List<Module> combatModules = new ArrayList<>(Arrays.asList(
         Modules.get().get(AnchorGod.class),
         Modules.get().get(BedGod.class),
-        Modules.get().get(SmartHoleFill.class),
+        Modules.get().get(ReaperHoleFill.class),
         Modules.get().get(CrystalAura.class),
         Modules.get().get(BedAura.class),
         Modules.get().get(HoleFiller.class),

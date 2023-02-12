@@ -3,18 +3,18 @@ package me.rickytheracc.reaperplus.modules.misc;
 import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.util.misc.MathUtil;
 import me.rickytheracc.reaperplus.util.misc.ModuleHelper;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 
-public class StrictMove extends ReaperModule {
+public class StrictMove extends Module {
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 

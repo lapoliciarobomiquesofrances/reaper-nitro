@@ -1,11 +1,11 @@
 package me.rickytheracc.reaperplus.modules.chat;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.DoubleSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -13,7 +13,7 @@ import net.minecraft.item.Items;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArmorAlert extends ReaperModule {
+public class ArmorAlert extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     // General

@@ -1,13 +1,13 @@
 package me.rickytheracc.reaperplus.modules.chat;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.IntSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.systems.modules.Module;
 
-public class NotifSettings extends ReaperModule {
+public class NotifSettings extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     // General

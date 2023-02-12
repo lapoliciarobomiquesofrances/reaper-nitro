@@ -1,6 +1,5 @@
 package me.rickytheracc.reaperplus.util.world;
 
-import me.rickytheracc.reaperplus.util.network.PacketManager;
 import me.rickytheracc.reaperplus.util.player.Interactions;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;

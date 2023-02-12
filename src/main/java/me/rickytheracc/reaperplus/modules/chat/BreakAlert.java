@@ -2,7 +2,6 @@ package me.rickytheracc.reaperplus.modules.chat;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.modules.combat.ReaperSurround;
-import me.rickytheracc.reaperplus.util.misc.ReaperModule;
 import me.rickytheracc.reaperplus.util.world.BlockHelper;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.render.Render2DEvent;
@@ -12,6 +11,7 @@ import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.renderer.text.TextRenderer;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.friends.Friends;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.combat.Surround;
 import meteordevelopment.meteorclient.utils.Utils;
@@ -32,7 +32,7 @@ import java.util.Map;
 
 import static me.rickytheracc.reaperplus.util.world.BlockHelper.isOurSurroundBlock;
 
-public class BreakAlert extends ReaperModule {
+public class BreakAlert extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgRender = settings.createGroup("Render");
 
