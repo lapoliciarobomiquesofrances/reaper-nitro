@@ -1,4 +1,4 @@
-package me.rickytheracc.reaperplus.util.misc;
+package me.rickytheracc.reaperplus.util.objects;
 
 import net.minecraft.util.math.Vec3d;
 
