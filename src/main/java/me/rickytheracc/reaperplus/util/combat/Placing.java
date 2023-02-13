@@ -98,7 +98,7 @@ public class Placing {
         if (sneak) handler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
 
         handler.sendPacket(new PlayerInteractBlockC2SPacket(hand, hitResult, 0));
-        if (swingMode.client()) mc.player.swingHand(hand);
+        if (swingMode.client()) mc.player.swingHand(hand, false);
         if (swingMode.packet()) handler.sendPacket(new HandSwingC2SPacket(hand));
 
         if (!selected && swapBack) InvUtils.swap(selectedSlot, false);
