@@ -246,7 +246,7 @@ public class Statistics {
 
                 Block block = mc.world.getBlockState(packet.getPos()).getBlock();
                 BlockSoundGroup group = block.getSoundGroup(block.getDefaultState());
-                
+
                 //TODO: Fix this throwing an illegal access exception
 
 //                mc.world.playSound(

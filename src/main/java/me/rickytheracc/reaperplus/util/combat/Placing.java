@@ -36,26 +36,17 @@ public class Placing {
         int priority, boolean airplace,
         boolean checkEntities, boolean swapBack
     ) {
-        if (!canPlace(pos, airplace) || !result.found()) {
-            ChatUtils.sendMsg("Placing", Text.of("Failed canplace test or result not found"));
-            return false;
-        }
+        if (!canPlace(pos, airplace) || !result.found()) return false;
 
         if (checkEntities) {
             ItemStack stack = mc.player.getInventory().getStack(result.slot());
             BlockState state = Block.getBlockFromItem(stack.getItem()).getDefaultState();
-            if (!mc.world.canPlace(state, pos, ShapeContext.absent())) {
-                ChatUtils.sendMsg("Placing", Text.of("Failed entities check"));
-                return false;
-            }
+            if (!mc.world.canPlace(state, pos, ShapeContext.absent())) return false;
         }
 
         // Create the BlockHitResult
         BlockHitResult hitResult = getPlaceResult(pos, airplace);
-        if (hitResult == null) {
-            ChatUtils.sendMsg("Placing", Text.of("Hitresult was null, failed"));
-            return false;
-        }
+        if (hitResult == null) return false;
 
         place(hitResult, result, swingMode, rotate, priority, swapBack);
         Statistics.addPlacement(hitResult.getBlockPos());
