@@ -3,6 +3,7 @@ package me.rickytheracc.reaperplus.util.combat;
 import me.rickytheracc.reaperplus.enums.AntiCheat;
 import me.rickytheracc.reaperplus.enums.SwingMode;
 import me.rickytheracc.reaperplus.mixininterface.IVec3d;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.player.Rotations;
@@ -16,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -34,16 +36,26 @@ public class Placing {
         int priority, boolean airplace,
         boolean checkEntities, boolean swapBack
     ) {
-        if (!canPlace(pos, airplace) || !result.found()) return false;
+        if (!canPlace(pos, airplace) || !result.found()) {
+            ChatUtils.sendMsg("Placing", Text.of("Failed canplace test or result not found"));
+            return false;
+        }
 
         if (checkEntities) {
             ItemStack stack = mc.player.getInventory().getStack(result.slot());
             BlockState state = Block.getBlockFromItem(stack.getItem()).getDefaultState();
-            if (!mc.world.canPlace(state, pos, ShapeContext.absent())) return false;
+            if (!mc.world.canPlace(state, pos, ShapeContext.absent())) {
+                ChatUtils.sendMsg("Placing", Text.of("Failed entities check"));
+                return false;
+            }
         }
 
         // Create the BlockHitResult
         BlockHitResult hitResult = getPlaceResult(pos, airplace);
+        if (hitResult == null) {
+            ChatUtils.sendMsg("Placing", Text.of("Hitresult was null, failed"));
+            return false;
+        }
 
         place(hitResult, result, swingMode, rotate, priority, swapBack);
         Statistics.addPlacement(hitResult.getBlockPos());
@@ -95,7 +107,7 @@ public class Placing {
 
     public static BlockHitResult getPlaceResult(BlockPos pos, boolean airPlace) {
         BlockPos neighbor = null;
-        Direction direction = closestDirection(pos, airPlace);
+        Direction direction = closestDirection(pos, false);
 
         if (direction != null) {
             neighbor = pos.offset(direction);
@@ -118,7 +130,7 @@ public class Placing {
         return new BlockHitResult(testVec, direction, neighbor, true);
     }
 
-    public static Direction closestDirection(BlockPos pos, boolean support) {
+    public static Direction closestDirection(BlockPos pos, boolean airplace) {
         Direction bestDirection = null;
         double bestDistance = 36.0;
 
@@ -130,7 +142,7 @@ public class Placing {
                 ChunkSectionPos.getSectionCoord(pos.getZ())
             );
 
-            if (!support || !chunk.getBlockState(pos).isReplaceable() || Statistics.pendingBlocks.containsKey(pos)) {
+            if (airplace || !chunk.getBlockState(pos).isReplaceable() || Statistics.pendingBlocks.containsKey(pos)) {
                 double distance = mc.player.squaredDistanceTo(sideVec(pos, direction));
 
                 if (distance < bestDistance) {
@@ -155,10 +167,8 @@ public class Placing {
     }
 
     private static boolean canPlace(BlockPos pos, boolean airplace) {
-        if (Statistics.pendingBlocks.containsKey(pos)) return false;
-
         BlockState state = mc.world.getBlockState(pos);
-        if (state.getMaterial().isReplaceable()) return false;
+        if (!state.getMaterial().isReplaceable()) return false;
 
         if (mc.world.isOutOfHeightLimit(pos.getY())) return false;
         if (!mc.world.getWorldBorder().contains(pos)) return false;

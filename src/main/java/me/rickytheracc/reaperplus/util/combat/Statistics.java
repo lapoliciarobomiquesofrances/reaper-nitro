@@ -246,13 +246,15 @@ public class Statistics {
 
                 Block block = mc.world.getBlockState(packet.getPos()).getBlock();
                 BlockSoundGroup group = block.getSoundGroup(block.getDefaultState());
+                
+                //TODO: Fix this throwing an illegal access exception
 
-                mc.world.playSound(
-                    packet.getPos().getX(), packet.getPos().getY(),
-                    packet.getPos().getZ(), group.getPlaceSound(),
-                    SoundCategory.BLOCKS, (group.getVolume() + 1.0F) / 8.0F,
-                    group.getPitch() * 0.5F, true
-                );
+//                mc.world.playSound(
+//                    packet.getPos().getX(), packet.getPos().getY(),
+//                    packet.getPos().getZ(), group.getPlaceSound(),
+//                    SoundCategory.BLOCKS, (group.getVolume() + 1.0F) / 8.0F,
+//                    group.getPitch() * 0.5F, true
+//                );
             }
         }
     }
