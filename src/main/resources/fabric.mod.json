@@ -3,14 +3,11 @@
   "id": "reaper-plus",
   "version": "${version}",
   "name": "Reaper Plus",
-  "description": "The best meteor addon but improved by Ricky.",
+  "description": "Reaper but better.",
   "authors": [
     "NotGhostTypes",
     "RickyTheRacc"
   ],
-  "contact": {
-    "discord": "https://discord.gg/kKjSHnXVZv"
-  },
   "environment": "client",
   "entrypoints": {
     "meteor": [

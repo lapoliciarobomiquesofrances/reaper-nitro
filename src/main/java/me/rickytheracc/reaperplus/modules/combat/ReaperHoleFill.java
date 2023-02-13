@@ -4,8 +4,8 @@ import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.enums.AntiCheat;
 import me.rickytheracc.reaperplus.enums.ResistType;
 import me.rickytheracc.reaperplus.enums.SwingMode;
-import me.rickytheracc.reaperplus.enums.SwitchMode;
 import me.rickytheracc.reaperplus.mixininterface.IVec3d;
+import me.rickytheracc.reaperplus.util.combat.Placing;
 import me.rickytheracc.reaperplus.util.combat.Ranges;
 import me.rickytheracc.reaperplus.util.player.Interactions;
 import me.rickytheracc.reaperplus.util.player.PlayerUtil;
@@ -20,9 +20,12 @@ import meteordevelopment.meteorclient.systems.friends.Friends;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
+import meteordevelopment.meteorclient.utils.render.RenderUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
+import meteordevelopment.meteorclient.utils.world.Dir;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -33,9 +36,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.*;
 import net.minecraft.world.chunk.WorldChunk;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class ReaperHoleFill extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -52,10 +53,17 @@ public class ReaperHoleFill extends Module {
         .build()
     );
 
-    private final Setting<SwitchMode> switchMode = sgGeneral.add(new EnumSetting.Builder<SwitchMode>()
-        .name("switch-mode")
-        .description("How to swap to the block while filling holes.")
-        .defaultValue(SwitchMode.Silent)
+    private final Setting<Boolean> swapBack = sgTargeting.add(new BoolSetting.Builder()
+        .name("swap-back")
+        .description("Swap back to the previous slot after placing.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> airPlace = sgTargeting.add(new BoolSetting.Builder()
+        .name("airplace")
+        .description("Allow the module to place mid air.")
+        .defaultValue(true)
         .build()
     );
 
@@ -165,13 +173,6 @@ public class ReaperHoleFill extends Module {
         .build()
     );
 
-    private final Setting<Boolean> predict = sgTargeting.add(new BoolSetting.Builder()
-        .name("predict")
-        .description("Predict where a player will be next tick.")
-        .defaultValue(false)
-        .build()
-    );
-
     // Ranges
 
     private final Setting<Double> targetRange = sgRange.add(new DoubleSetting.Builder()
@@ -265,11 +266,11 @@ public class ReaperHoleFill extends Module {
 
     List<PlayerEntity> targets = new ArrayList<>();
     List<BlockPos> blockPosList = new ArrayList<>();
-    List<BlockPos> holes = new ArrayList<>();
+    HashMap<BlockPos, Byte> holes = new HashMap<>();
 
     private final BlockPos.Mutable testPos = new BlockPos.Mutable();
     private final Box testBox= new Box(0, 0, 0, 0, 0, 0);
-    private Vec3d testVec;
+    private Vec3d testVec = new Vec3d(0, 0, 0);
 
     private int delay, blocksPlaced;
 
@@ -313,6 +314,7 @@ public class ReaperHoleFill extends Module {
             if (ignoreSafe.get()) if (CombatHelper.isInHole(player)) continue;
             if (onlyMoving.get()) if (!PlayerUtil.isMoving(player)) continue;
             targets.add(player);
+            if (targets.size() >= maxTargets.get()) break;
         }
 
         if (targets.isEmpty()) return;
@@ -327,48 +329,70 @@ public class ReaperHoleFill extends Module {
             BlockPos blockPos = iterator.next();
             if (!validHole(blockPos)) iterator.remove();
 
-            int bedrock = 0, obsidian = 0;
+            int blocks = 0;
             Direction air = null;
 
             for (Direction direction : Direction.values()) {
                 if (direction == Direction.UP) continue;
 
                 BlockPos offsetPos = blockPos.offset(direction);
-                if (BlockUtil.resistant(blockPos, ResistType.PERMANENT)) bedrock++;
-                else if (BlockUtil.resistant(blockPos, ResistType.BREAKABLE)) obsidian++;
+                if (BlockUtil.resistant(blockPos, ResistType.ANY)) blocks++;
 
-                else if (mc.world.getBlockState(offsetPos).isAir() && !doubles.get()) iterator.remove();
-                else if (direction == Direction.DOWN || air != null) iterator.remove();
+                else if (mc.world.getBlockState(offsetPos).isAir() && !doubles.get()) {
+                    iterator.remove();
+                    break;
+                }
+                else if (direction == Direction.DOWN || air != null) {
+                    iterator.remove();
+                    break;
+                }
 
                 else if (validHole(offsetPos)) {
                     for (Direction dir : Direction.values()) {
                         if (dir == direction.getOpposite() || dir == Direction.UP) continue;
 
-                        if (BlockUtil.resistant(blockPos, ResistType.PERMANENT)) bedrock++;
-                        else if (BlockUtil.resistant(blockPos, ResistType.BREAKABLE)) obsidian++;
-                        else iterator.remove();
+                        if (BlockUtil.resistant(blockPos, ResistType.PERMANENT)) blocks++;
+                        else {
+                            iterator.remove();
+                            break;
+                        }
                     }
 
                     air = direction;
                 }
             }
 
-            if (obsidian + bedrock == 5 && air == null) {
-                holes.add(blockPos);
-            } else if (obsidian + bedrock == 8 && doubles.get() && air != null) {
-                holes.add(blockPos);
-                holes.add(blockPos.offset(air));
+            if (blocks == 5 && air == null) {
+                holes.putIfAbsent(blockPos, null);
+            } else if (blocks == 8 && doubles.get() && air != null) {
+                holes.putIfAbsent(blockPos, Dir.get(air));
+                holes.putIfAbsent(blockPos.offset(air), Dir.get(air.getOpposite()));
             }
         }
 
-        for (BlockPos pos : holes) {
-        }
+        for (Map.Entry<BlockPos, Byte> entry : holes.entrySet()) {
+            if (Placing.place(entry.getKey(), item, swingMode.get(),
+                rotate.get(), rotatePrio.get(), airPlace.get(),
+                true, swapBack.get())
+            ) {
+                RenderUtils.renderTickingBlock(
+                    entry.getKey(), sideColor.get(), lineColor.get(),
+                    shapeMode.get(), entry.getValue(), fadeTime.get(),
+                    true, false
+                );
 
+                blocksPlaced++;
+
+                if (blocksPlaced >= holesPerTick.get()) {
+                    delay = placeDelay.get();
+                    break;
+                }
+            }
+        }
     }
 
     private boolean validHole(BlockPos pos) {
         testPos.set(pos);
-
         if (!Ranges.inBlockRange(pos, antiCheat.get(), placeRange.get())) return false;
 
         WorldChunk chunk = mc.world.getChunk(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ()));

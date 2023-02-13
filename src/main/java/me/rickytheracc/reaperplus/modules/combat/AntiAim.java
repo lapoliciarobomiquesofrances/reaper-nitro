@@ -1,4 +1,4 @@
-package me.rickytheracc.reaperplus.modules.misc;
+package me.rickytheracc.reaperplus.modules.combat;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.modules.combat.BedGod;
@@ -25,7 +25,7 @@ public class AntiAim extends Module {
     private final Setting<Integer> pSpeed = sgDefault.add(new IntSetting.Builder().name("speed").description("The speed at which you rotate.").defaultValue(5).range(1, 100).visible(pitch::get).build());
 
     public AntiAim() {
-        super(ReaperPlus.M, "anti-aim", "Makes your head spin around");
+        super(ReaperPlus.R, "anti-aim", "Makes your head spin around");
     }
 
     private short count = 0;
@@ -73,5 +73,11 @@ public class AntiAim extends Module {
 
     public enum Mode {
         All, ExceptElytra, None
+    }
+
+    public enum SpinMode {
+        Custom,
+        Random,
+        Rotate
     }
 }

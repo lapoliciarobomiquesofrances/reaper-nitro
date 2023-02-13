@@ -195,5 +195,4 @@ public class FakePlayerMixin extends Module {
             ChatUtils.error("Error exporting recording.");
         }
     }
-
 }

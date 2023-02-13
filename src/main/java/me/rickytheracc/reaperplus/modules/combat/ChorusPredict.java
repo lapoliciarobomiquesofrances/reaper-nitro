@@ -1,4 +1,4 @@
-package me.rickytheracc.reaperplus.modules.misc;
+package me.rickytheracc.reaperplus.modules.combat;
 
 
 import me.rickytheracc.reaperplus.ReaperPlus;

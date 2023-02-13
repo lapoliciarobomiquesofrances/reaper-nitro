@@ -12,7 +12,7 @@ import meteordevelopment.orbit.EventHandler;
 import java.util.List;
 import java.util.Random;
 
-public class AutoEZ extends Module {
+public class AutoEasy extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     // General
@@ -20,16 +20,16 @@ public class AutoEZ extends Module {
     public final Setting<Integer> ezDelay = sgGeneral.add(new IntSetting.Builder()
         .name("message-delay")
         .description("How many seconds before sending a message.")
-        .defaultValue(1)
+        .defaultValue(100)
         .min(1)
-        .sliderMax(100)
+        .sliderMax(200)
         .build()
     );
 
     private final Setting<Boolean> packet = sgGeneral.add(new BoolSetting.Builder()
         .name("packet")
         .description("Send the messages with packets so only other players see them.")
-        .defaultValue(false)
+        .defaultValue(true)
         .build()
     );
 
@@ -75,8 +75,8 @@ public class AutoEZ extends Module {
         .build()
     );
 
-    public AutoEZ() {
-        super(ReaperPlus.C, "auto-ez", "Send a message when you kill somebody.");
+    public AutoEasy() {
+        super(ReaperPlus.C, "auto-easy", "Send a message when you kill somebody.");
     }
 
     Random random = new Random();

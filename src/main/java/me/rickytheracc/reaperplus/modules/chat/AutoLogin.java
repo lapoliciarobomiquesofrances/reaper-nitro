@@ -25,6 +25,8 @@ public class AutoLogin extends Module {
         .name("delay")
         .description("Delay in ticks to wait before sending the login message")
         .defaultValue(20)
+        .min(0)
+        .sliderRange(0, 100)
         .build()
     );
 
@@ -38,7 +40,7 @@ public class AutoLogin extends Module {
     @EventHandler
     private void onJoin(GameJoinedEvent event) {
         shouldSend = true;
-        messageDelay = 40;
+        messageDelay = delay.get();
     }
 
     @EventHandler

@@ -94,7 +94,7 @@ public class ReaperPlus extends MeteorAddon {
         mods.add(new ReaperHoleFill());
 
         mods.add(new ArmorAlert());
-        mods.add(new AutoEZ());
+        mods.add(new AutoEasy());
         mods.add(new AutoLogin());
         mods.add(new BedAlerts());
         mods.add(new ChatTweaks());
