@@ -17,6 +17,7 @@ import net.minecraft.world.GameMode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
@@ -27,12 +28,13 @@ public class BlockUtil {
 
     public static List<BlockPos> getSphere(PlayerEntity player, double radius, AntiCheat antiCheat) {
         List<BlockPos> sphere = new ArrayList<>();
-
         int rad = (int) Math.ceil(radius);
+        
         int x = player.getBlockX();
         int y = player.getBlockY();
         if (antiCheat == AntiCheat.NoCheat) y++;
         int z = player.getBlockZ();
+        
         Vec3d origin = antiCheat.origin();
 
         for (int i = x - rad; i < x + rad; i++) {
@@ -73,7 +75,11 @@ public class BlockUtil {
     }
 
     public static boolean resistant(BlockPos pos, ResistType type) {
-        Block block = mc.world.getBlockState(pos).getBlock();
+        return resistant(mc.world.getBlockState(pos), type);
+    }
+
+    public static boolean resistant(BlockState state, ResistType type) {
+        Block block = state.getBlock();
         float hardness = block.getHardness();
         float resistance = block.getBlastResistance();
 

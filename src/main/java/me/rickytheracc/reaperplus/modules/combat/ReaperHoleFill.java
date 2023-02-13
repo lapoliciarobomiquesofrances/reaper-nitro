@@ -36,6 +36,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.*;
 import net.minecraft.world.chunk.WorldChunk;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class ReaperHoleFill extends Module {
@@ -322,51 +323,54 @@ public class ReaperHoleFill extends Module {
         // Find holes
         blockPosList.clear();
         holes.clear();
-        blockPosList= BlockUtil.getSphere(mc.player, placeRange.get(), antiCheat.get());
+        blockPosList = BlockUtil.getSphere(mc.player, placeRange.get(), antiCheat.get());
 
         Iterator<BlockPos> iterator = blockPosList.iterator();
         while (iterator.hasNext()) {
             BlockPos blockPos = iterator.next();
-            if (!validHole(blockPos)) iterator.remove();
+            if (!validHole(blockPos, null)) iterator.remove();
 
             int blocks = 0;
             Direction air = null;
 
-            for (Direction direction : Direction.values()) {
-                if (direction == Direction.UP) continue;
+            holecheck: {
+                for (Direction direction : Direction.values()) {
+                    if (direction == Direction.UP) continue;
 
-                BlockPos offsetPos = blockPos.offset(direction);
-                if (BlockUtil.resistant(blockPos, ResistType.ANY)) blocks++;
+                    BlockPos offsetPos = blockPos.offset(direction);
+                    BlockState offsetState = mc.world.getBlockState(offsetPos);
+                    if (BlockUtil.resistant(offsetState, ResistType.ANY)) blocks++;
 
-                else if (mc.world.getBlockState(offsetPos).isAir() && !doubles.get()) {
-                    iterator.remove();
-                    break;
-                }
-                else if (direction == Direction.DOWN || air != null) {
-                    iterator.remove();
-                    break;
-                }
-
-                else if (validHole(offsetPos)) {
-                    for (Direction dir : Direction.values()) {
-                        if (dir == direction.getOpposite() || dir == Direction.UP) continue;
-
-                        if (BlockUtil.resistant(blockPos, ResistType.PERMANENT)) blocks++;
-                        else {
-                            iterator.remove();
-                            break;
-                        }
+                    else if (offsetState.isAir() && !doubles.get()) {
+                        iterator.remove();
+                        break holecheck;
+                    }
+                    else if (direction == Direction.DOWN || air != null) {
+                        iterator.remove();
+                        break holecheck;
                     }
 
-                    air = direction;
-                }
-            }
+                    else if (validHole(offsetPos, offsetState)) {
+                        for (Direction dir : Direction.values()) {
+                            if (dir == direction.getOpposite() || dir == Direction.UP) continue;
 
-            if (blocks == 5 && air == null) {
-                holes.putIfAbsent(blockPos, null);
-            } else if (blocks == 8 && doubles.get() && air != null) {
-                holes.putIfAbsent(blockPos, Dir.get(air));
-                holes.putIfAbsent(blockPos.offset(air), Dir.get(air.getOpposite()));
+                            if (BlockUtil.resistant(offsetPos.offset(dir), ResistType.ANY)) blocks++;
+                            else {
+                                iterator.remove();
+                                break holecheck;
+                            }
+                        }
+
+                        air = direction;
+                    }
+                }
+
+                if (blocks == 5 && air == null) {
+                    holes.putIfAbsent(blockPos, null);
+                } else if (blocks == 8 && doubles.get() && air != null) {
+                    holes.putIfAbsent(blockPos, Dir.get(air));
+                    holes.putIfAbsent(blockPos.offset(air), Dir.get(air.getOpposite()));
+                }
             }
         }
 
@@ -391,18 +395,15 @@ public class ReaperHoleFill extends Module {
         }
     }
 
-    private boolean validHole(BlockPos pos) {
-        testPos.set(pos);
+    private boolean validHole(BlockPos pos, @Nullable BlockState state) {
         if (!Ranges.inBlockRange(pos, antiCheat.get(), placeRange.get())) return false;
 
         WorldChunk chunk = mc.world.getChunk(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ()));
-        BlockState state = chunk.getBlockState(pos);
+        if (state == null) state = chunk.getBlockState(pos);
         if (state.getBlock() == Blocks.COBWEB) return false;
 
-        if (((AbstractBlockAccessor) mc.world.getBlockState(testPos).getBlock()).isCollidable()) return false;
-        testPos.set(testPos.up());
-        if (((AbstractBlockAccessor) mc.world.getBlockState(testPos).getBlock()).isCollidable()) return false;
-        testPos.set(testPos.down());
+        if (((AbstractBlockAccessor) state.getBlock()).isCollidable()) return false;
+        if (((AbstractBlockAccessor) chunk.getBlockState(pos.up()).getBlock()).isCollidable()) return false;
 
         ((IBox) testBox).set(pos);
         if (!mc.world.getOtherEntities(null, testBox, entity
@@ -411,16 +412,17 @@ public class ReaperHoleFill extends Module {
             || entity instanceof EndCrystalEntity
         ).isEmpty()) return false;
 
-        ((IVec3d) testVec).set(pos);
-        testVec = testVec.add(0, 0.5, 0);
+        double x = pos.getX() + 0.5;
+        double y = pos.getY() + 1;
+        double z = pos.getZ() + 0.5;
 
-        return targets.stream().anyMatch(target -> {
-            boolean yCheck = target.getY() > testVec.y && target.getY() - testVec.y <= targetYDistance.get();
-            double dX = target.getX() - testVec.x, dZ = target.getZ() - testVec.z;
-            boolean xzCheck = Math.sqrt(dX * dX + dZ * dZ) <= targetXZDistance.get();
+        for (var target : targets) {
+            if (!(target.getY() > y && target.getY() - y <= targetYDistance.get())) continue;
+            double dX = target.getX() - x, dZ = target.getZ() - z;
+            if (dX * dX + dZ * dZ <= targetXZDistance.get() * targetXZDistance.get()) return true;
+        }
 
-            return yCheck && xzCheck;
-        });
+        return false;
     }
 
     private FindItemResult getItemResult() {
