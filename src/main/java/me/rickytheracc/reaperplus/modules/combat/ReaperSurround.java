@@ -32,6 +32,7 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -171,7 +172,7 @@ public class ReaperSurround extends Module {
 
     private final Setting<Boolean> breakCrystals = sgAntiCity.add(new BoolSetting.Builder()
         .name("break-crystals")
-        .description("Break beds holding your surround from being replaced.")
+        .description("Break crystals keeping your surround from being replaced.")
         .defaultValue(true)
         .build()
     );
@@ -446,6 +447,7 @@ public class ReaperSurround extends Module {
         int blocksPlaced = 0;
         boolean hasBroken = false;
         FindItemResult itemResult = getTargetBlock();
+        boolean damageImmune=  mc.player.hurtTime > 0;
 
         for (BlockPos pos : positions) {
             if (crystalDelay <= 0 && breakCrystals.get() && !hasBroken) {
@@ -455,8 +457,10 @@ public class ReaperSurround extends Module {
                 for (EndCrystalEntity crystal : crystals) {
                     if (crystal.age < ticksExisted.get()) continue;
 
-                    double damage = DamageUtils.crystalDamage(mc.player, crystal.getPos());
-                    if (damage >= PlayerUtils.getTotalHealth() && !suicideBreak.get()) continue;
+                    if (!damageImmune) {
+                        double damage = DamageUtils.crystalDamage(mc.player, crystal.getPos());
+                        if (damage >= PlayerUtils.getTotalHealth() && !suicideBreak.get()) continue;
+                    }
 
                     if (crystalsRotate.get()) Rotations.rotate(Rotations.getYaw(crystal), Rotations.getPitch(crystal));
 
@@ -474,7 +478,7 @@ public class ReaperSurround extends Module {
             if (blockDelay <= 0) {
                 if (Placing.place(pos, itemResult, placeSwingMode.get(),
                     rotate.get(), 999, airPlace.get(),
-                    true, swapBack.get())
+                    checkEntities.get(), swapBack.get())
                 ) {
                     RenderUtils.renderTickingBlock(
                         pos, placeSides.get(), placeLines.get(),
