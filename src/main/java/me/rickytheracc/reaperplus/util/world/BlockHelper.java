@@ -224,10 +224,8 @@ public class BlockHelper {
 
 
     public static String getBlockDirectionFromPlayer(BlockPos pos) {
-
         double posX = Math.floor(mc.player.getX());
         double posZ = Math.floor(mc.player.getZ());
-
         double x = posX - pos.getX();
         double z = posZ - pos.getZ();
 

@@ -1,4 +1,4 @@
-package me.rickytheracc.reaperplus.mixins;
+package me.rickytheracc.reaperplus.mixin;
 
 import me.rickytheracc.reaperplus.mixininterface.IBlink;
 import me.rickytheracc.reaperplus.mixininterface.IBox;

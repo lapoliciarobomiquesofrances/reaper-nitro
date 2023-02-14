@@ -3,6 +3,7 @@ package me.rickytheracc.reaperplus.util.combat;
 import me.rickytheracc.reaperplus.enums.AntiCheat;
 import me.rickytheracc.reaperplus.enums.SwingMode;
 import me.rickytheracc.reaperplus.mixininterface.IVec3d;
+import meteordevelopment.meteorclient.mixininterface.IClientPlayerInteractionManager;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
@@ -85,14 +86,20 @@ public class Placing {
 
         // Actually place the block
 
-        if (!selected) InvUtils.swap(result.slot(), false);
+        if (!selected) {
+            mc.player.getInventory().selectedSlot = result.slot();
+            ((IClientPlayerInteractionManager) mc.interactionManager).syncSelected();
+        }
         if (sneak) handler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
 
         handler.sendPacket(new PlayerInteractBlockC2SPacket(hand, hitResult, 0));
         if (swingMode.client()) mc.player.swingHand(hand, false);
         if (swingMode.packet()) handler.sendPacket(new HandSwingC2SPacket(hand));
 
-        if (!selected && swapBack) InvUtils.swap(selectedSlot, false);
+        if (!selected && swapBack) {
+            mc.player.getInventory().selectedSlot = selectedSlot;
+            ((IClientPlayerInteractionManager) mc.interactionManager).syncSelected();
+        }
         if (sneak) handler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
     }
 

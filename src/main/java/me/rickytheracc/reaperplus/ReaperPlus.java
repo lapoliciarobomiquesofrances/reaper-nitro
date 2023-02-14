@@ -12,7 +12,6 @@ import me.rickytheracc.reaperplus.modules.external.ExternalFeed;
 import me.rickytheracc.reaperplus.modules.external.ExternalHUD;
 import me.rickytheracc.reaperplus.modules.external.ExternalNotifs;
 import me.rickytheracc.reaperplus.util.combat.Statistics;
-import me.rickytheracc.reaperplus.util.misc.MathUtil;
 import me.rickytheracc.reaperplus.util.services.NotificationManager;
 import me.rickytheracc.reaperplus.util.services.ResourceLoaderService;
 import meteordevelopment.meteorclient.MeteorClient;
@@ -116,6 +115,8 @@ public class ReaperPlus extends MeteorAddon {
         mods.add(new ExternalFeed());
         mods.add(new ExternalHUD());
         mods.add(new ExternalNotifs());
+
+        mods.add(new ReaperSurround());
 
         Hud hud = Hud.get();
         hud.register(CustomImage.INFO);

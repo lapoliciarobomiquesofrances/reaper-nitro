@@ -1,4 +1,4 @@
-package me.rickytheracc.reaperplus.mixins;
+package me.rickytheracc.reaperplus.mixin;
 
 import meteordevelopment.meteorclient.settings.StringListSetting;
 import org.spongepowered.asm.mixin.Mixin;

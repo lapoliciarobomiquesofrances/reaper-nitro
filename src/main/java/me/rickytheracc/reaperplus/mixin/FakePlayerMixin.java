@@ -1,4 +1,4 @@
-package me.rickytheracc.reaperplus.mixins;
+package me.rickytheracc.reaperplus.mixin;
 
 import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.util.objects.AnglePos;

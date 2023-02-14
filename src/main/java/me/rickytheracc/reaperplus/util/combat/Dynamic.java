@@ -1,9 +1,10 @@
 package me.rickytheracc.reaperplus.util.combat;
 
+import me.rickytheracc.reaperplus.enums.ResistType;
 import me.rickytheracc.reaperplus.mixininterface.IBox;
 import me.rickytheracc.reaperplus.util.player.PlayerUtil;
-import meteordevelopment.meteorclient.systems.modules.Modules;
-import meteordevelopment.meteorclient.systems.modules.movement.Blink;
+import me.rickytheracc.reaperplus.util.world.BlockUtil;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -17,6 +18,15 @@ public class Dynamic {
     private static final List<BlockPos> posList = new ArrayList<>();
     private static final BlockPos.Mutable testPos = new BlockPos.Mutable();
     private static Box box = new Box(0, 0, 0, 0, 0, 0);
+
+    public static boolean allPlaced(List<BlockPos> list) {
+        for (BlockPos pos : list) {
+            BlockState state = mc.world.getBlockState(pos);
+            if (state.isReplaceable()) return false;
+        }
+
+        return true;
+    }
 
     public static double[][] eightWay(Box box) {
         return new double[][]{

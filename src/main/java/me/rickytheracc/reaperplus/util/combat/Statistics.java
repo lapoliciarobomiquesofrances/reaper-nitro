@@ -1,5 +1,6 @@
 package me.rickytheracc.reaperplus.util.combat;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import me.rickytheracc.reaperplus.ReaperPlus;
@@ -18,7 +19,9 @@ import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.combat.*;
 import meteordevelopment.meteorclient.utils.PostInit;
 import meteordevelopment.meteorclient.utils.Utils;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
+import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.starscript.value.Value;
 import net.minecraft.block.Block;
@@ -31,12 +34,17 @@ import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.world.chunk.WorldChunk;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
+import java.awt.event.WindowFocusListener;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -47,7 +55,6 @@ public class Statistics {
     public static final Object2IntMap<UUID> totemPops = new Object2IntOpenHashMap<>();
     public static final Object2IntMap<UUID> playerDeaths = new Object2IntOpenHashMap<>();
     public static final HashMap<BlockPos, Long> pendingBlocks = new HashMap<>();
-    private static ScheduledExecutorService thread;
 
     public static List<Module> combatModules = new ArrayList<>(Arrays.asList(
         Modules.get().get(AnchorGod.class),
@@ -76,12 +83,10 @@ public class Statistics {
     @PostInit
     public static void init() {
         MeteorClient.EVENT_BUS.subscribe(Statistics.class);
-        ReaperPlus.scheduled.schedule(() -> {
-            if (pendingBlocks.isEmpty()) return;
-            removeExpiredPlacements();
-        }, 10, TimeUnit.MILLISECONDS);
+        ReaperPlus.scheduled.scheduleAtFixedRate(Statistics::removeExpiredPlacements, 0, 25, TimeUnit.MILLISECONDS);
         startTime = System.currentTimeMillis();
     }
+
     @EventHandler
     public static void onGameJoin(GameJoinedEvent event) {
         kills = 0;
@@ -242,20 +247,18 @@ public class Statistics {
             if (pendingBlocks.isEmpty()) return;
 
             if (pendingBlocks.containsKey(packet.getPos())) {
-                synchronized (pendingBlocks) {pendingBlocks.remove(packet.getPos());}
-
                 Block block = mc.world.getBlockState(packet.getPos()).getBlock();
                 BlockSoundGroup group = block.getSoundGroup(block.getDefaultState());
 
-                //TODO: Fix this throwing an illegal access exception
-
-//                mc.world.playSound(
-//                    packet.getPos().getX(), packet.getPos().getY(),
-//                    packet.getPos().getZ(), group.getPlaceSound(),
-//                    SoundCategory.BLOCKS, (group.getVolume() + 1.0F) / 8.0F,
-//                    group.getPitch() * 0.5F, true
-//                );
+                RenderSystem.recordRenderCall(() -> mc.world.playSound(
+                    packet.getPos().getX(), packet.getPos().getY(),
+                    packet.getPos().getZ(), group.getPlaceSound(),
+                    SoundCategory.BLOCKS, group.getVolume(),
+                    group.getPitch() * 0.8F, true
+                ));
             }
+
+            synchronized (pendingBlocks) {pendingBlocks.remove(packet.getPos());}
         }
     }
 
@@ -279,13 +282,12 @@ public class Statistics {
         }
     }
 
-    private static void removeExpiredPlacements() {
-        double latency = PlayerUtil.getEntry().getLatency() * 1.2;
-        for (Map.Entry<BlockPos, Long> entry : pendingBlocks.entrySet()) {
-            if (System.currentTimeMillis() - entry.getValue() <= latency) continue;
-            synchronized (pendingBlocks) {
-                pendingBlocks.remove(entry.getKey());
-            }
+    public static void removeExpiredPlacements() {
+        double latency = PlayerUtils.getPing() * 1.2;
+        Iterator<Map.Entry<BlockPos, Long>> iterator = pendingBlocks.entrySet().iterator();
+        while (iterator.hasNext()) {
+            long passedTime = System.currentTimeMillis() - iterator.next().getValue();
+            if (passedTime > latency) iterator.remove();
         }
     }
 }

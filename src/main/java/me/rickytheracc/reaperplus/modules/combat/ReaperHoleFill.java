@@ -286,10 +286,8 @@ public class ReaperHoleFill extends Module {
         if (delay > 0) {
             delay--;
             return;
-        } else {
-            delay = placeDelay.get();
-            blocksPlaced = 0;
-        }
+        } else blocksPlaced = 0;
+
 
         boolean shouldFill = switch (fillMode.get()) {
             case Both -> Interactions.isBurrowed() && Interactions.isInHole();
@@ -387,7 +385,10 @@ public class ReaperHoleFill extends Module {
                 );
 
                 blocksPlaced++;
-                if (blocksPlaced >= holesPerTick.get()) break;
+                if (blocksPlaced >= holesPerTick.get()) {
+                    delay = placeDelay.get();
+                    break;
+                }
             }
         }
     }
