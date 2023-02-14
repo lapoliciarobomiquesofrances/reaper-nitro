@@ -482,5 +482,4 @@ public class ReaperHoleFill extends Module {
         Burrow,
         Both
     }
-
 }
