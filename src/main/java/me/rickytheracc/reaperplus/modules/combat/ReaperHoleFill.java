@@ -4,7 +4,6 @@ import me.rickytheracc.reaperplus.ReaperPlus;
 import me.rickytheracc.reaperplus.enums.AntiCheat;
 import me.rickytheracc.reaperplus.enums.ResistType;
 import me.rickytheracc.reaperplus.enums.SwingMode;
-import me.rickytheracc.reaperplus.mixininterface.IVec3d;
 import me.rickytheracc.reaperplus.util.combat.Placing;
 import me.rickytheracc.reaperplus.util.combat.Ranges;
 import me.rickytheracc.reaperplus.util.combat.Statistics;
@@ -26,7 +25,6 @@ import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.meteorclient.utils.world.Dir;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -35,14 +33,21 @@ import net.minecraft.entity.TntEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.chunk.WorldChunk;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ReaperHoleFill extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
+    private final SettingGroup sgAntiCheat = settings.createGroup("AntiCheat");
     private final SettingGroup sgTargeting = settings.createGroup("Targeting");
     private final SettingGroup sgRange = settings.createGroup("Ranges");
     private final SettingGroup sgRender = settings.createGroup("Pause");
@@ -53,38 +58,6 @@ public class ReaperHoleFill extends Module {
         .name("anti-cheat")
         .description("Which anti cheat the server uses.")
         .defaultValue(AntiCheat.NoCheat)
-        .build()
-    );
-
-    private final Setting<Boolean> swapBack = sgGeneral.add(new BoolSetting.Builder()
-        .name("swap-back")
-        .description("Swap back to the previous slot after placing.")
-        .defaultValue(true)
-        .build()
-    );
-
-    private final Setting<Boolean> airPlace = sgGeneral.add(new BoolSetting.Builder()
-        .name("airplace")
-        .description("Allow the module to place mid air.")
-        .defaultValue(true)
-        .build()
-    );
-
-    private final Setting<Integer> placeDelay = sgGeneral.add(new IntSetting.Builder()
-        .name("place-delay")
-        .description("Delay between placing in holes.")
-        .defaultValue(1)
-        .min(0)
-        .sliderMax(10)
-        .build()
-    );
-
-    private final Setting<Integer> holesPerTick = sgGeneral.add(new IntSetting.Builder()
-        .name("holes-/-tick")
-        .description("How many holes to fill per tick.")
-        .defaultValue(3)
-        .min(0)
-        .sliderMax(10)
         .build()
     );
 
@@ -129,16 +102,52 @@ public class ReaperHoleFill extends Module {
         .build()
     );
 
-    private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
-        .name("rotate")
+    // Anticheat
+
+    private final Setting<Integer> placeDelay = sgAntiCheat.add(new IntSetting.Builder()
+        .name("place-delay")
+        .description("Delay between placing in holes.")
+        .defaultValue(1)
+        .min(0)
+        .sliderMax(10)
+        .build()
+    );
+
+    private final Setting<Integer> holesPerTick = sgAntiCheat.add(new IntSetting.Builder()
+        .name("holes-/-tick")
+        .description("How many holes to fill per tick.")
+        .defaultValue(3)
+        .min(0)
+        .sliderMax(10)
+        .build()
+    );
+
+    private final Setting<Boolean> swapBack = sgAntiCheat.add(new BoolSetting.Builder()
+        .name("swap-back")
+        .description("Swap back to the previous slot after placing.")
         .defaultValue(true)
         .build()
     );
 
-    private final Setting<Integer> rotatePrio = sgGeneral.add(new IntSetting.Builder()
+    private final Setting<Boolean> airPlace = sgAntiCheat.add(new BoolSetting.Builder()
+        .name("airplace")
+        .description("Allow the module to place mid air.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> rotate = sgAntiCheat.add(new BoolSetting.Builder()
+        .name("rotate")
+        .description("Rotate towards the blocks you're placing.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Integer> rotatePrio = sgAntiCheat.add(new IntSetting.Builder()
         .name("rotate-priority")
+        .description("How high to prioritize the rotations.")
         .defaultValue(50)
-        .min(1)
+        .min(0)
         .sliderMax(100)
         .visible(rotate::get)
         .build()
@@ -269,7 +278,7 @@ public class ReaperHoleFill extends Module {
 
     List<PlayerEntity> targets = new ArrayList<>();
     List<BlockPos> blockPosList = new ArrayList<>();
-    HashMap<BlockPos, Byte> holes = new HashMap<>();
+    HashMap<BlockPos, Integer> holes = new HashMap<>();
 
     private final Box testBox  = new Box(0, 0, 0, 0, 0, 0);
     private int delay, blocksPlaced;
@@ -361,10 +370,10 @@ public class ReaperHoleFill extends Module {
             if (skip) continue;
 
             if (blocks == 5 && air == null) {
-                holes.putIfAbsent(blockPos, null);
+                holes.putIfAbsent(blockPos, 0);
             } else if (blocks == 8 && doubles.get() && air != null) {
-                holes.putIfAbsent(blockPos, Dir.get(air));
-                holes.putIfAbsent(blockPos.offset(air), Dir.get(air.getOpposite()));
+                holes.putIfAbsent(blockPos, (int) Dir.get(air));
+                holes.putIfAbsent(blockPos.offset(air), (int) Dir.get(air.getOpposite()));
             }
         }
 
@@ -373,7 +382,7 @@ public class ReaperHoleFill extends Module {
             return;
         }
 
-        for (Map.Entry<BlockPos, Byte> entry : holes.entrySet()) {
+        for (Map.Entry<BlockPos, Integer> entry : holes.entrySet()) {
             if (Placing.place(entry.getKey(), item, swingMode.get(),
                 rotate.get(), rotatePrio.get(), airPlace.get(),
                 true, swapBack.get())
@@ -423,7 +432,6 @@ public class ReaperHoleFill extends Module {
             || entity instanceof EndCrystalEntity
         );
 
-
         if (!entities.isEmpty()) {
             if (entities.contains(mc.player)) info("Entity is the player");
             info("Pos had an entity inside, failed");
@@ -435,9 +443,11 @@ public class ReaperHoleFill extends Module {
         double z = pos.getZ() + 0.5;
 
         for (var target : targets) {
-            if (!(target.getY() > y && target.getY() - y <= targetYDistance.get())) continue;
+            boolean yCheck = target.getY() <= y || y - target.getY() >= targetYDistance.get();
             double dX = target.getX() - x, dZ = target.getZ() - z;
-            if (dX * dX + dZ * dZ <= targetXZDistance.get() * targetXZDistance.get()) return true;
+            boolean xzCheck = dX * dX + dZ * dZ <= targetXZDistance.get() * targetXZDistance.get();
+
+            if (yCheck && xzCheck) return true;
         }
 
         return false;
